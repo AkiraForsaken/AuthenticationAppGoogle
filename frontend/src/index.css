@@ -1,0 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400..900;1,400..900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Outfit:wght@100..900&display=swap');
+
+@import 'tailwindcss';
+
+*{
+  font-family: "Montserrat", sans-serif;
+}
+
+@theme {
+  --color-primary: #5EABD6;
+  --color-primary-dull: #44ae7c;
+}
+
+@layer base {
+    * {
+        box-sizing: border-box;
+    }
+
+    button {
+        cursor: pointer;
+    }
+}
+
+@layer components {
+  
+}
+
+@utility flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@utility text-gradient {
+  @apply bg-linear-to-r from-[#552586] to-[#804FB3] bg-clip-text text-transparent;
+}
+
+.no-scrollbar::-webkit-scrollbar{
+  display: none;
+}

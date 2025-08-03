@@ -1,0 +1,93 @@
+import React from 'react'
+import { Outlet, NavLink, useNavigate } from 'react-router-dom'
+import toast from 'react-hot-toast'
+import { useAppContext } from '../../context/AppContext'
+import { AppBar, Toolbar, IconButton, Typography, Drawer, List, ListItem, ListItemIcon, ListItemText, Box, Button, Divider } from '@mui/material'
+import AssignmentIcon from '@mui/icons-material/Assignment'
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import GroupIcon from '@mui/icons-material/Group'
+import PersonAddIcon from '@mui/icons-material/PersonAdd'
+import LogoutIcon from '@mui/icons-material/Logout'
+
+const sidebarLinks = [
+  { name: 'Manage Tasks', path: '/admin', icon: <AssignmentIcon /> },
+  { name: 'Verify Tasks', path: '/admin/verify', icon: <CheckCircleIcon /> },
+  { name: 'User Management', path: '/admin/add-users', icon: <GroupIcon /> }, // Placeholder
+]
+
+const drawerWidth = 220
+
+const Admin = () => {
+  const { axios, user, setUser, setIsAdmin } = useAppContext()
+  const navigate = useNavigate()
+
+  const logout = async () => {
+    try {
+      const res = await axios.get('/api/users/logout');
+      if (res.data.success){
+        toast.success(res.data.message);
+        setUser(null);
+        setIsAdmin(false);
+        // localStorage.removeItem('token');
+        navigate('/');
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  }
+
+  return (
+    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#f7f8fa' }}>
+      {/* Sidebar */}
+      <Drawer
+        variant="permanent"
+        sx={{
+          width: drawerWidth,
+          flexShrink: 0,
+          [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box', bgcolor: 'white', borderRight: '1px solid #e0e0e0' },
+        }}
+      >
+        <Toolbar sx={{ minHeight: 64 }} />
+        <Box sx={{ overflow: 'auto', mt: 2 }}>
+          <List>
+            {sidebarLinks.map((item) => (
+              <ListItem
+                key={item.name}
+                component={NavLink}
+                to={item.path}
+                end={item.path === '/admin'}
+                sx={({ isActive }) => ({
+                  bgcolor: isActive ? 'primary.light' : 'inherit',
+                  color: isActive ? 'primary.main' : 'inherit',
+                  borderLeft: isActive ? '4px solid #1976d2' : '4px solid transparent',
+                  '&:hover': { bgcolor: '#f5f5f5' },
+                })}
+              >
+                <ListItemIcon sx={{ color: 'inherit' }}>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.name} />
+              </ListItem>
+            ))}
+          </List>
+        </Box>
+      </Drawer>
+      {/* Main content */}
+      <Box sx={{ flexGrow: 1 }}>
+        {/* Top bar */}
+        <AppBar position="static" color="inherit" elevation={1} sx={{ zIndex: 1201 }}>
+          <Toolbar sx={{ justifyContent: 'space-between' }}>
+            <Typography variant="h5" fontWeight={700} color="primary">Admin Panel</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Typography color="textSecondary">Hi! Admin {user ? user.name : null}</Typography>
+              <Button variant="outlined" color="primary" startIcon={<LogoutIcon />} onClick={logout}>Logout</Button>
+            </Box>
+          </Toolbar>
+        </AppBar>
+        <Box sx={{ p: 3 }}>
+          <Outlet />
+        </Box>
+      </Box>
+    </Box>
+  )
+}
+
+export default Admin
