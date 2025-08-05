@@ -170,17 +170,17 @@ const Dashboard = () => {
         display: 'flex',
         flexDirection: { xs: 'column', md: 'row' },
         gap: { xs: 2, md: 10 },
-        bgcolor: '#e3f2fd', // light blue background
+        bgcolor: 'mainBg.light', 
         minHeight: '100vh',
         py: { xs: 2, md: 8 },
         px: { xs: 1, md: 4 },
       }}
     >
       {/* ------------------- Week navigation (top on mobilem, right on pc) -------------------*/}
-      <Box sx={{ flex: 1, minWidth: { xs: '100%', md: 300 }, mb: { xs: 2, md: 0 }, order: { xs: 0, md: 1 } }}>
-        <Card sx={{ p: 2, mb: 2 }}>
-          <CardContent>
-            <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2, textAlign: 'center' }}>
+      <Box sx={{ flex: 1, minWidth: { xs: '100%', md: 300 }, mb: { xs: 2, md: 0 }, order: { xs: 0, md: 1 }}}>
+        <Card sx={{ p: 2, mb: 2, bgcolor: 'card.main' }}>
+          <CardContent sx={{color: 'card.contrastText'}}>
+            <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2, textAlign: 'center'}}>
               Week
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
@@ -191,13 +191,13 @@ const Dashboard = () => {
           </CardContent>
         </Card>
         {/* Mini Calendar */}
-        <Card sx={{ p: 2 }}>
-          <Typography variant="subtitle1" sx={{ mb: 2, textAlign: 'center' }}>
+        <Card sx={{ p: 2, bgcolor: 'card.main', color: 'card.contrastText' }}>
+          <Typography variant="h6" fontWeight={600} sx={{ mb: 3, textAlign: 'center' }}>
             {baseDate.toLocaleString('default', { month: 'long' })} {calendarYear}
           </Typography>
           <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 0.5, mb: 1 }}>
             {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
-              <Typography key={i} variant="caption" align="center" sx={{ fontWeight: 600 }}>{d}</Typography>
+              <Typography key={i} variant="body1" align="center" sx={{ fontWeight: 600 }}>{d}</Typography>
             ))}
             {calendarMatrix.flat().map((date, i) => {
               const highlightWeek = isInCurrentWeek(date)
@@ -213,7 +213,7 @@ const Dashboard = () => {
                     borderRadius: '50%',
                     bgcolor: highlightDay ? 'primary.main' : highlightWeek ? 'primary.light' : undefined,
                     color: highlightDay ? 'white' : highlightWeek ? 'primary.dark' : undefined,
-                    border: highlightWeek ? '2px solid #1976d2' : undefined,
+                    border: highlightWeek ? '2px solid #ffbbd7ff' : undefined,
                     fontWeight: highlightDay ? 700 : 400,
                     m: 0.2,
                   }}
@@ -227,13 +227,13 @@ const Dashboard = () => {
       </Box>
       {/* ------------------ Left: Days (below on mobile, left on desktop) ---------------- */}
       <Box sx={{ flex: 3, width: '100%' }}>
-        <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 6, textAlign: 'center' }}>
+        <Typography variant="h3" sx={{ fontWeight: 'bold', mb: 6, textAlign: 'center', color: 'mainBg.contrastText' }}>
           Your Weekly Tasks
         </Typography>
         <Grid container spacing={3} sx={{ justifyContent: { xs: 'center', md: 'flex-start' } }}>
           {weekDates.map((date, idx) => (
             <Grid key={idx} 
-            size={{xs: 12, sm: 6, md: 12, lg: 4}}
+            size={{xs: 12, md: 6, lg: 4}}
             sx={{ display: 'flex', justifyContent: 'center' }}>
               <Card
                 sx={{
@@ -241,18 +241,19 @@ const Dashboard = () => {
                   minWidth: { xs: 250, md: 300 },
                   maxWidth: 400,
                   mb: 2,
-                  background: isToday(date) ? '#e3f2fd' : undefined,
                   boxShadow: 3,
                   cursor: 'pointer',
                   transition: 'box-shadow 0.2s',
                   '&:hover': { boxShadow: 8 },
-                  border: isToday(date) ? '2px solid #1976d2' : undefined,
+                  color: !isToday(date) ? 'card.contrastText' : 'card.highlightText',
+                  bgcolor: !isToday(date) ? 'card.main' : 'card2',
+                  border: isToday(date) ? '2px solid #000000ff' : 'none',
                 }}
                 onClick={() => handleDayDialogOpen(idx)}
               >
                 <CardContent>
-                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 2, textAlign: 'center' }}>{formatDay(date, idx)}</Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
+                  <Typography variant="h6" sx={{ fontWeight: 600, mb: 1, textAlign: 'center' }}>{formatDay(date, idx)}</Typography>
+                  <Typography fontSize={22} fontWeight={500} color={(tasksByDay[idx] || []).length >= 1 ? 'card.highlightText' : 'text.secondary'} sx={{ textAlign: 'center' }}>
                     {(tasksByDay[idx] || []).length} task{(tasksByDay[idx] || []).length !== 1 ? 's' : ''}
                   </Typography>
                 </CardContent>

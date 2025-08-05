@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Box, Typography, Card, CardContent, TextField, Avatar, Button, Divider, List, ListItem, ListItemText, IconButton, Container } from '@mui/material'
+import { Box, Typography, Card, CardContent, TextField, Avatar, Button, Divider, List, ListItem, IconButton, Grid } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import SaveIcon from '@mui/icons-material/Save'
 import AddIcon from '@mui/icons-material/Add'
@@ -69,7 +69,7 @@ const Profile = () => {
     <Box
       sx={{
         gap: { xs: 2, md: 10 },
-        bgcolor: '#e3f2fd', // light blue background
+        bgcolor: 'mainBg.light', // light blue background
         minHeight: '100vh',
         py: { xs: 2, md: 4 },
       }}
@@ -82,7 +82,7 @@ const Profile = () => {
         maxWidth: 1400, mt: 4 }}>
 
         {/* -------------------- Left: Profile info -------------------- */}
-        <Card sx={{ flex: 1, minWidth: 300, maxWidth: 400, minHeight: 600}}>
+        <Card sx={{ flex: 1, minWidth: 300, maxWidth: 400, minHeight: 600, bgcolor: 'card.main', color: 'card.contrastText'}}>
           <CardContent>
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
               <Avatar src={user.picture} alt={user.name} sx={{ width: 150, height: 150, mb: 2 }} />
@@ -103,12 +103,12 @@ const Profile = () => {
                 <Typography variant="h5" fontWeight={700}>{user.name}</Typography>
               )}
 
-              <Typography color="text.primary">{user.email}</Typography>
-              <Typography color="text.primary" fontSize={14}>{user.role.toUpperCase()}</Typography>
+              <Typography fontWeight={600}>{user.email}</Typography>
+              <Typography fontSize={18}>{user.role.toUpperCase()}</Typography>
               
               <Divider sx={{ my: 2, width: '100%' }} />
 
-              <Typography variant="subtitle1" fontWeight={700}>Social Links</Typography>
+              <Typography variant="body1" fontSize={24} fontWeight={700}>Social Links</Typography>
               <Box sx={{ width: '100%' }}>
                 {socialLinks.map((link, idx) => (
                   <Box key={idx} sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
@@ -156,29 +156,45 @@ const Profile = () => {
         </Card>
 
         {/* -------------------- Right: Tasks -------------------- */}
-        <Card sx={{flex: 2, minHeight:600}}>
+        <Card sx={{flex: 2, minHeight:600, bgcolor: 'card.main', color: 'card.contrastText'}}>
           <CardContent>
-            <Typography variant="h4" fontWeight={700} fontFamily={"Montserrat"} mb={2} sx={{textAlign: 'center'}}>
+            <Typography variant="h4" fontWeight={700} fontFamily={"Montserrat"} mb={4} sx={{textAlign: 'center'}}>
               Your Tasks
             </Typography>
-            <List>
+
+            <Grid container spacing={10} sx={{ justifyContent: { xs: 'center', md: 'flex-start'}}}>
+              {userTasks.length === 0 && <Typography>No tasks assigned.</Typography>}
+              {userTasks.map(task => (
+                <Grid key={task._id}
+                size={{xs: 12, lg: 6}} 
+                sx={{ display: 'flex', justifyContent: 'center' }}>
+                  <Box>
+                    <Typography fontSize={18} fontWeight={700}>{task.name}</Typography>
+                    <span>Status: {task.status}</span>
+                    <br />
+                    <span>Deadline: {new Date(task.deadline).toLocaleDateString()}</span>
+                    <br />
+                    <span>Category: {task.category}</span>
+                  </Box>
+                </Grid>
+              ))}
+            </Grid>
+
+            {/* <List>
               {userTasks.length === 0 && <Typography>No tasks assigned.</Typography>}
               {userTasks.map(task => (
                 <ListItem key={task._id} disableGutters>
-                  <ListItemText
-                  primary={task.name}
-                  secondary={
-                    <>
-                      <span>Status: {task.status}</span>
-                      <br />
-                      <span>Deadline: {new Date(task.deadline).toLocaleDateString()}</span>
-                      <br />
-                      <span>Category: {task.category}</span>
-                    </>  
-                  }/>
+                  <Box>
+                    <Typography fontSize={18} fontWeight={700}>{task.name}</Typography>
+                    <span>Status: {task.status}</span>
+                    <br />
+                    <span>Deadline: {new Date(task.deadline).toLocaleDateString()}</span>
+                    <br />
+                    <span>Category: {task.category}</span>
+                  </Box>
                 </ListItem>
               ))}
-            </List>
+            </List> */}
           </CardContent>
         </Card>
     </Box>

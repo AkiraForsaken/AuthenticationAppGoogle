@@ -91,10 +91,12 @@ const VerifyTask = () => {
     return acc;
   }, {});
   return (
-    <Box sx={{ maxWidth: 900, mx: 'auto', mt: 4 }}>
-      <Card>
+    <Box sx={{ maxWidth: 900, mx: 'auto', mt: 4}}>
+      <Card sx={{p: 2, color: 'card.contrastText', bgcolor: 'card.main'}}>
         <CardContent>
-          <Typography variant="h5" fontWeight={700} mb={2}>Verify Student Tasks</Typography>
+          <Typography variant="h4" fontWeight={700} mb={2} sx={{textAlign: 'center' }}>
+            Verify Student Tasks
+          </Typography>
           <FormControl fullWidth margin="normal">
             <InputLabel>Select Student</InputLabel>
             <Select
@@ -119,7 +121,7 @@ const VerifyTask = () => {
           )}
           {!loading && selectedUserId && Object.entries(tasksByDate).map(([date, tasks]) => (
             <Box key={date} sx={{ mt: 2 }}>
-              <Typography variant="subtitle1" fontWeight={600}>{date}</Typography>
+              <Typography fontSize={20} fontWeight={600}>{date}</Typography>
               <List>
                 {tasks.map(task => ( // mapping each tasks for a given date
                   <ListItem key={task._id} disableGutters
@@ -135,40 +137,36 @@ const VerifyTask = () => {
                       </Button>
                     }
                   >
-                    <ListItemText
-                      primary={task.name}
-                      secondary={
+                    <Box>
+                      <Typography>{task.name}</Typography>
+                      <span>Status: {task.status}</span>
+                      <br />
+                      <span>Category: {task.category}</span>
+                      <br />
+                      <span>Instructions: {task.instructions}</span>
+                      {/* Proof file view */}
+                      {task.proofUrl && (
                         <>
-                          <span>Status: {task.status}</span>
                           <br />
-                          <span>Category: {task.category}</span>
-                          <br />
-                          <span>Instructions: {task.instructions}</span>
-                          {/* Proof file view */}
-                          {task.proofUrl && (
-                            <>
-                              <br />
-                              <Button
-                                variant="outlined"
-                                size="small"
-                                sx={{ mt: 1, mb: 1 }}
-                                onClick={() => setVisibleProofId(visibleProofId === task._id ? null : task._id)}
-                              >
-                                {visibleProofId === task._id ? 'Hide Proof' : 'Show Proof'}
-                              </Button>
-                              {visibleProofId === task._id && (
-                                <img
-                                  src={`${import.meta.env.VITE_BACKEND_URL}${task.proofUrl}`}
-                                  alt="Proof"
-                                  // style={{ maxWidth: 200, marginTop: 8, borderRadius: 8 }}
-                                  className='max-w-200 mt-8 rounded-md'
-                                />
-                              )}
-                            </>
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            sx={{ mt: 1, mb: 1 }}
+                            onClick={() => setVisibleProofId(visibleProofId === task._id ? null : task._id)}
+                          >
+                            {visibleProofId === task._id ? 'Hide Proof' : 'Show Proof'}
+                          </Button>
+                          {visibleProofId === task._id && (
+                            <img
+                              src={`${import.meta.env.VITE_BACKEND_URL}${task.proofUrl}`}
+                              alt="Proof"
+                              // style={{ maxWidth: 200, marginTop: 8, borderRadius: 8 }}
+                              className='max-w-200 mt-8 rounded-md'
+                            />
                           )}
                         </>
-                      }
-                    />
+                      )}
+                    </Box>
                   </ListItem>
                 ))}
               </List>

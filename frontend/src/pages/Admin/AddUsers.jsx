@@ -30,35 +30,39 @@ const AddUsers = () => {
     }
   }
   return (
-    <Card>
-      <CardContent>
-        <Typography variant='h6' fontWeight={700} mb={2}> Add New User</Typography>
-        <form onSubmit={handleSubmit}>
-          <TextField
-            label='Email' value={email} onChange={e => setEmail(e.target.value)}
-            fullWidth required margin='normal' type='email'
-          />
-          <TextField
-            label='Name' value={name} onChange={e => setName(e.target.value)}
-            fullWidth required margin='normal'
-          />
-          <TextField
-            label='Picture URL' value={picture} onChange={e => setPicture(e.target.value)}
-            fullWidth margin='normal'
-          />
-          <TextField
-            label='Role' value={role} onChange={e => setRole(e.target.value)}
-            fullWidth required margin='normal' select
-          >
-            {roles.map(r => <MenuItem key={r} value={r}> {r.toUpperCase ()} </MenuItem>)}
-          </TextField>
+    <Box sx={{ maxWidth: 900, mx: 'auto', mt: 4}}>
+      <Card sx={{p: 2, color: 'card.contrastText', bgcolor: 'card.main'}}>
+        <CardContent>
+          <Typography variant="h4" fontWeight={700} mb={2} sx={{textAlign: 'center' }}>
+            Add New User
+          </Typography>
+          <form onSubmit={handleSubmit}>
+            <TextField
+              label='Email' value={email} onChange={e => setEmail(e.target.value)}
+              fullWidth required margin='normal' type='email'
+            />
+            <TextField
+              label='Name' value={name} onChange={e => setName(e.target.value)}
+              fullWidth required margin='normal'
+            />
+            <TextField
+              label='Picture URL' value={picture} onChange={e => setPicture(e.target.value)}
+              fullWidth margin='normal'
+            />
+            <TextField
+              label='Role' value={role} onChange={e => setRole(e.target.value)}
+              fullWidth required margin='normal' select
+            >
+              {roles.map(r => <MenuItem key={r} value={r}> {r.toUpperCase ()} </MenuItem>)}
+            </TextField>
 
-          <Box mt={2}>
-            <Button type='submit' variant='contained' color='primary' fullWidth>Add User</Button>
-          </Box>         
-        </form>
-      </CardContent>
-    </Card>
+            <Box mt={2}>
+              <Button type='submit' variant='contained' color='primary' fullWidth>Add User</Button>
+            </Box>         
+          </form>
+        </CardContent>
+      </Card>
+    </Box>
   )
 }
 

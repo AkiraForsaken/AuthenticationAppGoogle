@@ -14,6 +14,7 @@ import ManageTasks from './pages/Admin/ManageTasks.jsx'
 import VerifyTask from './pages/Admin/VerifyTask.jsx'
 import RequireAuth from './pages/auth/RequireAuth.jsx'
 import RequireAdmin from './pages/auth/RequireAdmin.jsx'
+import Footer from './components/Footer.jsx'
 
 function App() {
 
@@ -49,6 +50,7 @@ function App() {
             </Route>
         </Routes>
       </div>
+      {!isAdmin && <Footer/>}
       
     </div>
   )

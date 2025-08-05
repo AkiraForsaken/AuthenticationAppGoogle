@@ -47,21 +47,21 @@ const Navbar = () => {
 
   return (
     <AppBar position="sticky" elevation={1} 
-    sx={{ bgcolor: 'white', color: '#222', fontFamily: 'Montserrat, sans-serif' }}>
-      <Toolbar sx={{ justifyContent: 'space-between', minHeight: 64 }}>
+    sx={{ bgcolor: 'mainBg.white', fontFamily: 'Montserrat, sans-serif', color: 'mainBg.contrastText' }}>
+      <Toolbar sx={{ justifyContent: 'space-between', maxHeight: 64}}>
         <Box
         sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' , gap: 2, p: 4}}>
           <NavLink to='/' style={{ textDecoration: 'none' }}>
             <Typography variant='h4' fontWeight={700}
-            sx={{ color: '#222', textAlign: 'center' }}>
+            sx={{textAlign: 'center' }}>
               Home
             </Typography>
           </NavLink>
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}> 
           <Button href="https://study4.com" variant='text' 
-          sx={{ p: 1, maxWidth: 150, textAlign: 'center', fontWeight: 500, textTransform: 'uppercase' }}> 
-            Do exercises here 
+          sx={{ p: 1, maxWidth: 150, textAlign: 'center', fontWeight: 500, textTransform: 'none', color: 'mainBg.contrastText'}}> 
+            <span className='text-lg'>Do exercises here</span> 
           </Button>
           {/* Google login button or user profile */}
           {!user ? (
@@ -105,7 +105,7 @@ const Navbar = () => {
             <>
               <IconButton onClick={handleMenu} size="small" sx={{ ml: 2 }}>
                 <Avatar src={user.picture || profileIcon} alt={user.name} 
-                sx={{ width: 36, height: 36 }} />
+                sx={{ width: 36, height: 36, mr: 2 }} />
               </IconButton>
               <Menu
                 anchorEl={anchorEl}

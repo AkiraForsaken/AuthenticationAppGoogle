@@ -37,18 +37,18 @@ const Admin = () => {
   }
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#f7f8fa' }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'mainBg.light' }}>
       {/* Sidebar */}
       <Drawer
         variant="permanent"
         sx={{
           width: drawerWidth,
           flexShrink: 0,
-          [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box', bgcolor: 'white', borderRight: '1px solid #e0e0e0' },
+          [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box', bgcolor: 'mainBg.white'},
         }}
       >
-        <Toolbar sx={{ minHeight: 64 }} />
-        <Box sx={{ overflow: 'auto', mt: 2 }}>
+        <Toolbar sx={{ minHeight: 64, bgcolor: 'mainBg.white' }} />
+        <Box sx={{ overflow: 'auto', mt: 2, bgcolor: 'mainBg.white' }}>
           <List>
             {sidebarLinks.map((item) => (
               <ListItem
@@ -73,12 +73,18 @@ const Admin = () => {
       {/* Main content */}
       <Box sx={{ flexGrow: 1 }}>
         {/* Top bar */}
-        <AppBar position="static" color="inherit" elevation={1} sx={{ zIndex: 1201 }}>
+        <AppBar position="static" color="inherit" elevation={1} sx={{ zIndex: 1201, bgcolor: 'mainBg.white'}}>
           <Toolbar sx={{ justifyContent: 'space-between' }}>
-            <Typography variant="h5" fontWeight={700} color="primary">Admin Panel</Typography>
+            <Typography variant="h3" fontWeight={700} color="mainBg.whiteText">
+              Admin Panel
+            </Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <Typography color="textSecondary">Hi! Admin {user ? user.name : null}</Typography>
-              <Button variant="outlined" color="primary" startIcon={<LogoutIcon />} onClick={logout}>Logout</Button>
+              <Typography fontSize={20} color="mainBg.whiteText"> 
+                Hello Admin {user ? user.name : null}
+              </Typography>
+              <Button variant="contained" color="primary" startIcon={<LogoutIcon />} onClick={logout}>
+                Logout
+              </Button>
             </Box>
           </Toolbar>
         </AppBar>

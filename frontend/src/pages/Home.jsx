@@ -1,5 +1,5 @@
 import React from 'react'
-import { Card, CardContent, Typography, Button, Grid } from '@mui/material'
+import { Card, CardContent, Typography, Button, Grid, Box } from '@mui/material'
 import { useAppContext } from '../context/AppContext'
 
 const features = [
@@ -20,23 +20,23 @@ const features = [
 const Home = () => {
     const { user, navigate } = useAppContext();
   return (
-    <div className='flex flex-col items-center justify-center min-h-[80vh] py-10 bg-blue-100'>
-      <Typography variant="h2" fontWeight={700} sx={{mb: 4, textAlign: 'center'}}>
+    <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 900, py: 5, bgcolor: 'mainBg.light'}}>
+      <Typography variant="h2" fontWeight={700} sx={{mb: 4, textAlign: 'center', color: 'mainBg.contrastText'}}>
         Welcome to the Task Planner Website
       </Typography>
-      <Typography variant="h5" fontWeight={500} sx={{mb: 4, textAlign: 'center', maxWidth: 550}}>
+      <Typography variant="h5" fontWeight={500} sx={{mb: 4, textAlign: 'center', maxWidth: 550, color: 'mainBg.contrastText'}}>
         Get your students on track to greatness! 
         Assign, monitor, and complete daily tasks with ease.
       </Typography>
       <Grid container spacing={4} justifyContent="center" sx={{mb: 4, gap: 4}}>
         {features.map((feature, i) => (
           <Grid key={i}>
-            <Card className="shadow-md h-full">
+            <Card elevation={4} sx={{color: 'mainBg.whiteText'}}>
               <CardContent>
                 <Typography variant="h6" fontWeight={600} sx={{mb: 1, textAlign: 'center'}}>
                   {feature.title}
                 </Typography>
-                <Typography variant="body1" color="text.secondary">
+                <Typography variant="body1">
                   {feature.description}
                 </Typography>
               </CardContent>
@@ -49,7 +49,7 @@ const Home = () => {
       >
         Get Started
       </Button>
-    </div>
+    </Box>
   )
 }
 

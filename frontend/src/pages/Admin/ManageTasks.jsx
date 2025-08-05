@@ -40,9 +40,10 @@ const ManageTasks = () => {
   }
 
   return (
-    <Card sx={{mx: 'auto', mt: 4, p: 2 }}>
+    <Box sx={{ maxWidth: 900, mx: 'auto', mt: 4}}>
+    <Card sx={{ p: 2, color: 'card.contrastText', bgcolor: 'card.main'}}>
       <CardContent>
-        <Typography variant="h4" fontWeight={700} mb={2} className='text-center text-primary'>
+        <Typography variant="h4" fontWeight={700} mb={2} sx={{textAlign: 'center' }}>
           Create New Task
         </Typography>
         <form onSubmit={handleSubmit}>
@@ -104,6 +105,7 @@ const ManageTasks = () => {
         </form>
       </CardContent>
     </Card>
+    </Box>
   )
 }
 
