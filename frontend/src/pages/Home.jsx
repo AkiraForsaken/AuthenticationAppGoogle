@@ -27,14 +27,22 @@ const Home = () => {
         const res = await axios.get('/api/health');
         console.log('Backend test successful:', res.data);
         
-        // Also test CORS endpoint
+        // Test CORS endpoint
         try {
           const corsRes = await axios.get('/api/cors-test');
           console.log('CORS test successful:', corsRes.data);
-          alert('Backend connection successful!\nCORS is working properly.');
         } catch (corsError) {
           console.error('CORS test failed:', corsError);
-          alert('Backend connection successful, but CORS might have issues.');
+        }
+        
+        // Test auth endpoint
+        try {
+          const authRes = await axios.get('/api/auth-test');
+          console.log('Auth test successful:', authRes.data);
+          alert(`Backend connection successful!\nCORS: Working\nAuth: ${authRes.data.hasToken ? 'Has token' : 'No token'}`);
+        } catch (authError) {
+          console.error('Auth test failed:', authError);
+          alert('Backend connection successful, but auth test failed.');
         }
       } catch (error) {
         console.error('Backend test failed:', error);

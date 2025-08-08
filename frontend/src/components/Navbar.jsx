@@ -86,13 +86,17 @@ const Navbar = () => {
               useOneTap={false}
               onSuccess={async credentialResponse => {
                 try {
+                  console.log('Google login successful, sending credential to backend...');
                   const res = await axios.post('/api/auth/google', {
                     credential: credentialResponse.credential
                   });
+                  console.log('Backend login response:', res.data);
+                  
                   if (res.data.success){
                     setUser(res.data.user);
                     setIsAdmin(res.data.user.role === 'admin');
-                    // localStorage.setItem('token', res.data.token);
+                    console.log('Login successful, user:', res.data.user.name);
+                    
                     if (res.data.user.role === 'admin'){
                       navigate('/admin');
                     } else {
@@ -103,9 +107,9 @@ const Navbar = () => {
                     toast.error(res.data.message);
                   }
                 } catch (error) {
+                  console.error('Login error:', error.response?.data || error.message);
                   toast.error(error.response?.data?.message || 'Login failed')
                 }
-                // setUser({ name: 'John Doe', email: 'john@example.com', picture: profileIcon });
               }}
               onError={() => {toast.error('Google login failed')
               }}

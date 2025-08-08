@@ -3,8 +3,6 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import axios from "axios";
 
-axios.defaults.withCredentials = true;
-
 // Better backend URL configuration
 const getBackendURL = () => {
   if (process.env.NODE_ENV === 'production') {
@@ -13,12 +11,16 @@ const getBackendURL = () => {
   return 'http://localhost:5000';
 };
 
+// Configure axios defaults
 axios.defaults.baseURL = getBackendURL();
+axios.defaults.withCredentials = true; // This is crucial for sending cookies
+axios.defaults.headers.common['Content-Type'] = 'application/json';
 
 // Add request interceptor for debugging
 axios.interceptors.request.use(
   (config) => {
     console.log('Making request to:', config.baseURL + config.url);
+    console.log('With credentials:', config.withCredentials);
     return config;
   },
   (error) => {
@@ -29,10 +31,11 @@ axios.interceptors.request.use(
 // Add response interceptor for debugging
 axios.interceptors.response.use(
   (response) => {
+    console.log('Response received:', response.status, response.config.url);
     return response;
   },
   (error) => {
-    console.error('Request failed:', error.response?.data || error.message);
+    console.error('Request failed:', error.response?.status, error.response?.data || error.message);
     return Promise.reject(error);
   }
 );
@@ -54,22 +57,24 @@ export const AppContextProvider = ({children})=>{
 
     const fetchUser = async ()=>{
         try {
+            console.log('Fetching user authentication...');
             const res = await axios.get('/api/users/is-auth');
+            console.log('Auth response:', res.data);
+            
             if (res.data.success){
                 setUser(res.data.user);
                 setIsAdmin(res.data.user.role === 'admin');
-                // console.log("Success fetch");
-                // toast.success("Logged in"); // being called twice and development because of StrictMode 
+                console.log('User authenticated:', res.data.user.name);
             } else {
+                console.log('No authenticated user found');
                 setUser(null);
                 setIsAdmin(false);
-                // toast.error(res.data.message);
             }
         } catch (error) {
+            console.error('Auth fetch error:', error.response?.status, error.response?.data);
             setUser(null);
             setIsAdmin(false);
-            toast.error(error.message);
-            // console.log(error.message);
+            // Don't show toast for auth errors as they're expected when not logged in
         }
     }
 

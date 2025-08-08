@@ -90,6 +90,19 @@ app.get('/api/cors-test', (req, res) => {
   });
 });
 
+// Auth test endpoint
+app.get('/api/auth-test', (req, res) => {
+  const token = req.cookies.token;
+  res.json({ 
+    success: true, 
+    message: 'Auth test endpoint',
+    hasToken: !!token,
+    cookies: req.cookies,
+    headers: req.headers,
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Test endpoint for Render deployment
 app.get('/api/test', (req, res) => {
   res.json({ 
