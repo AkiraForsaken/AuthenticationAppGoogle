@@ -3,11 +3,10 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import axios from "axios";
 
-console.log(process.env.NODE_ENV);
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = process.env.NODE_ENV === 'production' 
                             ? import.meta.env.VITE_BACKEND_URL
-                            : import.meta.env.VITE_BACKEND_URL;
+                            : 'http://localhost:5000';
 
 export const AppContext = createContext();
 
