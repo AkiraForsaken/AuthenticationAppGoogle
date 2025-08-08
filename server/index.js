@@ -47,15 +47,15 @@ app.use('/api/auth', authRouter);
 app.use('/api/users', userRouter);
 app.use('/api/tasks', taskRouter);
 app.use('/api/notifications', notificationRouter);
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ 
-    success: false, 
-    message: process.env.NODE_ENV === 'production' 
-      ? 'Internal server error' 
-      : err.message 
-  });
-});
+// app.use((err, req, res, next) => {
+//   console.error(err.stack);
+//   res.status(500).json({ 
+//     success: false, 
+//     message: process.env.NODE_ENV === 'production' 
+//       ? 'Internal server error' 
+//       : err.message 
+//   });
+// });
 
 app.listen(port, ()=>{
   console.log(`Server is runnning on localhost:${port}`)
