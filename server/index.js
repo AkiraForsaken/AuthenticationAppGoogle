@@ -36,26 +36,33 @@ app.use(cors({
   },
   credentials: true,
 }));
-// app.use('/uploads', express.static(path.join(process.cwd(), 'uploads'))); 
-// process.cwd( is already server, so joining with )
-app.use('/uploads', cors(), express.static(path.join(process.cwd(), 'uploads')));
-// express app uses uploads foler 
 
 app.get('/', (req, res) => res.send('API is working'));
+
+// Test endpoint for Render deployment
+app.get('/api/test', (req, res) => {
+  res.json({ 
+    success: true, 
+    message: 'Server is running on Render',
+    timestamp: new Date().toISOString()
+  });
+});
 
 app.use('/api/auth', authRouter);
 app.use('/api/users', userRouter);
 app.use('/api/tasks', taskRouter);
 app.use('/api/notifications', notificationRouter);
-// app.use((err, req, res, next) => {
-//   console.error(err.stack);
-//   res.status(500).json({ 
-//     success: false, 
-//     message: process.env.NODE_ENV === 'production' 
-//       ? 'Internal server error' 
-//       : err.message 
-//   });
-// });
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ 
+    success: false, 
+    message: process.env.NODE_ENV === 'production' 
+      ? 'Internal server error' 
+      : err.message 
+  });
+});
 
 app.listen(port, ()=>{
   console.log(`Server is runnning on localhost:${port}`)

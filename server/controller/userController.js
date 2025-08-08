@@ -28,7 +28,14 @@ export const addUsers = async (req, res)=>{
         
         // Handle picture upload if file is provided
         if (req.file) {
-            userData.picture = `/uploads/${req.file.filename}`;
+            const fs = await import('fs');
+            const fileBuffer = fs.readFileSync(req.file.path);
+            const base64Image = `data:${req.file.mimetype};base64,${fileBuffer.toString('base64')}`;
+            
+            // Clean up temporary file
+            fs.unlinkSync(req.file.path);
+            
+            userData.picture = base64Image;
         } else if (picture) {
             userData.picture = picture;
         }
@@ -141,9 +148,22 @@ export const uploadPicture = async (req, res)=>{
         if (!user){
             return res.status(404).json({ success: false, message: "User not found"})
         }
-        user.picture = `/uploads/${req.file.filename}`;
-        await user.save();
-        res.json({success: true, user, url: user.picture})
+        
+        // Handle file upload - read from /tmp and convert to base64
+        if (req.file) {
+            const fs = await import('fs');
+            const fileBuffer = fs.readFileSync(req.file.path);
+            const base64Image = `data:${req.file.mimetype};base64,${fileBuffer.toString('base64')}`;
+            
+            // Clean up temporary file
+            fs.unlinkSync(req.file.path);
+            
+            user.picture = base64Image;
+            await user.save();
+            res.json({success: true, user, url: user.picture})
+        } else {
+            res.status(400).json({ success: false, message: "No file uploaded" });
+        }
     } catch (error) {
         res.status(500).json({ success: false, message: "Error in uploadPicture" });
         console.log(error.message)

@@ -2,8 +2,36 @@ import express from 'express'
 import {addUsers, isAuth, logout, getUserList, updateUserInfo, uploadPicture, getTasksForUser} from '../controller/userController.js'
 import authUser from '../middleware/authUser.js'
 import multer from 'multer';
+import path from 'path';
 
-const upload = multer({dest: 'uploads/'});  // configure to upload profile picture
+// Use /tmp directory for Render's ephemeral filesystem
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, '/tmp/');
+  },
+  filename: (req, file, cb) => {
+    // Get extension from original name
+    const ext = path.extname(file.originalname);
+    // Use random string + extension
+    cb(null, Date.now() + '-' + Math.round(Math.random() * 1E9) + ext);
+  }
+});
+
+const upload = multer({
+  storage,
+  fileFilter: (req, file, cb) => {
+    // Only allow images
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed!'), false);
+    }
+  },
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+  }
+});
+
 const userRouter = express.Router();
 
 userRouter.post('/add', addUsers);

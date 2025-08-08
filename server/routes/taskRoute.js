@@ -4,9 +4,10 @@ import authUser from '../middleware/authUser.js';
 import multer from 'multer';
 import path from 'path';
 
+// Use /tmp directory for Render's ephemeral filesystem
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/');
+    cb(null, '/tmp/');
   },
   filename: (req, file, cb) => {
     // Get extension from original name
@@ -15,8 +16,7 @@ const storage = multer.diskStorage({
     cb(null, Date.now() + '-' + Math.round(Math.random() * 1E9) + ext);
   }
 });
-// const upload = multer({dest: 'uploads/'})
-// const upload = multer({ storage });
+
 const upload = multer({
   storage,
   fileFilter: (req, file, cb) => {
@@ -31,6 +31,7 @@ const upload = multer({
     fileSize: 5 * 1024 * 1024, // 5MB limit
   }
 });
+
 const taskRouter = express.Router();
 
 taskRouter.post('/add', authUser, addTask);
