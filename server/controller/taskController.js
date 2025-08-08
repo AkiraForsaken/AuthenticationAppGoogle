@@ -1,5 +1,6 @@
 import Task from '../models/Task.js'
 import User from '../models/User.js'
+import Notification from '../models/Notification.js'
 import multer from 'multer'
 import fs from 'fs'
 import path from 'path'
@@ -23,6 +24,13 @@ export const addTask = async (req, res)=>{
             {name, instructions, deadline, category, assignedTo, status: 'pending'}
         );
         await User.findByIdAndUpdate(assignedTo, { $push: {tasks: task._id}}); // update the user's tasks array for fetching
+        await Notification.create({
+            userId: assignedTo,
+            title: 'New Task Assigned',
+            message: `You have been assigned to a new task: ${name}`,
+            type: 'task_assigned',
+            relatedTask: task._id
+        })
         
         res.json({ success: true, message: 'Task created', task});
     } catch (error) {

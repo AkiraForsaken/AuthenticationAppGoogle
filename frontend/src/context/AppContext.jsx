@@ -18,8 +18,8 @@ export const AppContextProvider = ({children})=>{
         const stored = localStorage.getItem('darkMode');
         return stored ? JSON.parse(stored) : false;
     });
-    
-    const value = {navigate, user, setUser, isAdmin, setIsAdmin, userList, setUserList, userTasks, setUserTasks, axios, darkMode, setDarkMode};
+    const [notifications, setNotifications] = useState([]);
+    const [unreadCount, setUnreadCount] = useState(0);
 
     const fetchUser = async ()=>{
         try {
@@ -84,6 +84,20 @@ export const AppContextProvider = ({children})=>{
         }
     } */
 
+    const fetchNotifications = async () => {
+        try {
+            const res = await axios.get('/api/notifications/get');
+            if (res.data.success){
+                setNotifications(res.data.notifications);
+                setUnreadCount(res.data.notifications.filter(n => !n.isRead).length);
+            } else {
+                toast.error(res.data.message)
+            }
+        } catch (error) {
+            toast.error('Failed to fetch notifications:', error);
+        }
+    }
+
     // Because all fetch functions are async, it sets states (e.g user and isAdmin) after the effect runs
     useEffect(()=>{
         fetchUser()
@@ -93,6 +107,7 @@ export const AppContextProvider = ({children})=>{
         // Fetch functions
         if (user && !isAdmin){
             fetchTasks();
+            fetchNotifications();
         }
         if (user && isAdmin){
             fetchUserList();
@@ -103,6 +118,8 @@ export const AppContextProvider = ({children})=>{
     useEffect(() => {
         localStorage.setItem('darkMode', JSON.stringify(darkMode));
     }, [darkMode]);
+
+    const value = {navigate, user, setUser, isAdmin, setIsAdmin, userList, setUserList, userTasks, setUserTasks, axios, darkMode, setDarkMode, notifications, unreadCount, fetchNotifications};
 
     return <AppContext.Provider value={value}>
         {children}

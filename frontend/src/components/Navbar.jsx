@@ -8,6 +8,7 @@ import Brightness7Icon from '@mui/icons-material/Brightness7';
 import { GoogleLogin } from '@react-oauth/google'
 import profileIcon from '../assets/profile_icon.png'
 import toast from 'react-hot-toast'
+import NotificationMenu from './NotificationMenu.jsx';
 
 const Navbar = () => {
   const { axios, user, setUser, isAdmin, setIsAdmin, darkMode, setDarkMode } = useAppContext();
@@ -62,10 +63,11 @@ const Navbar = () => {
           </NavLink>
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}> 
-          <Button href="https://study4.com" variant='text' 
+          {/* <Button href="https://study4.com" variant='text' 
           sx={{ p: 1, maxWidth: 150, textAlign: 'center', fontWeight: 500, textTransform: 'none', color: 'mainBg.contrastText'}}> 
             <span className='text-lg'>Do exercises here</span> 
-          </Button>
+          </Button> */}
+          {user && !isAdmin && <NotificationMenu />}
           {/* Dark mode button */}
           <IconButton sx={{ ml: 1 }} onClick={()=>setDarkMode(!darkMode)} color="inherit">
             {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
@@ -110,7 +112,7 @@ const Navbar = () => {
             </Box>
           ) : (
             <>
-              <IconButton onClick={handleMenu} size="small" sx={{ ml: 2 }}>
+              <IconButton onClick={handleMenu} size="medium" sx={{ ml: 1 }}>
                 <Avatar 
                   src={user.picture ? `${import.meta.env.VITE_BACKEND_URL}${user.picture}` : profileIcon} 
                   alt={user.name} 

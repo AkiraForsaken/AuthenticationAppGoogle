@@ -8,6 +8,7 @@ import 'dotenv/config'
 import authRouter from './routes/authRoute.js'
 import userRouter from './routes/userRoute.js'
 import taskRouter from './routes/taskRoute.js'
+import notificationRouter from './routes/notificationRoute.js'
 // const authRouter = require('./routes/authRoute.js'); if use module.exports
 
 const app = express();
@@ -33,6 +34,7 @@ app.get('/', (req, res) => res.send('API is working'));
 app.use('/api/auth', authRouter);
 app.use('/api/users', userRouter);
 app.use('/api/tasks', taskRouter);
+app.use('/api/notifications', notificationRouter);
 
 app.listen(port, ()=>{
   console.log(`Server is runnning on localhost:${port}`)
