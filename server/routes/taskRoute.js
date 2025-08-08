@@ -4,21 +4,9 @@ import authUser from '../middleware/authUser.js';
 import multer from 'multer';
 import path from 'path';
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/');
-  },
-  filename: (req, file, cb) => {
-    // Get extension from original name
-    const ext = path.extname(file.originalname);
-    // Use random string + extension
-    cb(null, Date.now() + '-' + Math.round(Math.random() * 1E9) + ext);
-  }
-});
-// const upload = multer({dest: 'uploads/'})
-// const upload = multer({ storage });
+// Use memory storage instead of disk storage for serverless compatibility
 const upload = multer({
-  storage,
+  storage: multer.memoryStorage(),
   fileFilter: (req, file, cb) => {
     // Only allow images
     if (file.mimetype.startsWith('image/')) {
@@ -31,6 +19,7 @@ const upload = multer({
     fileSize: 5 * 1024 * 1024, // 5MB limit
   }
 });
+
 const taskRouter = express.Router();
 
 taskRouter.post('/add', authUser, addTask);

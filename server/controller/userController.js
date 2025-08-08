@@ -26,9 +26,10 @@ export const addUsers = async (req, res)=>{
         if (phoneNumber) userData.phoneNumber = phoneNumber;
         if (birthDate) userData.birthDate = new Date(birthDate);
         
-        // Handle picture upload if file is provided
+        // Handle picture upload if file is provided (memory storage)
         if (req.file) {
-            userData.picture = `/uploads/${req.file.filename}`;
+            const base64Image = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+            userData.picture = base64Image;
         } else if (picture) {
             userData.picture = picture;
         }
@@ -141,9 +142,16 @@ export const uploadPicture = async (req, res)=>{
         if (!user){
             return res.status(404).json({ success: false, message: "User not found"})
         }
-        user.picture = `/uploads/${req.file.filename}`;
-        await user.save();
-        res.json({success: true, user, url: user.picture})
+        
+        // Handle memory storage - convert to base64 for storage
+        if (req.file) {
+            const base64Image = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+            user.picture = base64Image;
+            await user.save();
+            res.json({success: true, user, url: user.picture})
+        } else {
+            res.status(400).json({ success: false, message: "No file uploaded" });
+        }
     } catch (error) {
         res.status(500).json({ success: false, message: "Error in uploadPicture" });
         console.log(error.message)

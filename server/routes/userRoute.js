@@ -3,7 +3,22 @@ import {addUsers, isAuth, logout, getUserList, updateUserInfo, uploadPicture, ge
 import authUser from '../middleware/authUser.js'
 import multer from 'multer';
 
-const upload = multer({dest: 'uploads/'});  // configure to upload profile picture
+// Use memory storage instead of disk storage for serverless compatibility
+const upload = multer({
+  storage: multer.memoryStorage(),
+  fileFilter: (req, file, cb) => {
+    // Only allow images
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed!'), false);
+    }
+  },
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+  }
+});
+
 const userRouter = express.Router();
 
 userRouter.post('/add', addUsers);

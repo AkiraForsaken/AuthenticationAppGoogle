@@ -159,7 +159,7 @@ const VerifyTask = () => {
                           </Button>
                           {visibleProofId === task._id && (
                             <img
-                              src={`${import.meta.env.VITE_BACKEND_URL}${task.proofUrl}`}
+                              src={task.proofUrl.startsWith('data:') ? task.proofUrl : `${import.meta.env.VITE_BACKEND_URL}${task.proofUrl}`}
                               alt="Proof"
                               // style={{ maxWidth: 200, marginTop: 8, borderRadius: 8 }}
                               className='max-w-200 mt-8 rounded-md'

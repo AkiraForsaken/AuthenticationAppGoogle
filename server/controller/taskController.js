@@ -1,12 +1,6 @@
 import Task from '../models/Task.js'
 import User from '../models/User.js'
 import Notification from '../models/Notification.js'
-import multer from 'multer'
-import fs from 'fs'
-import path from 'path'
-import process from 'process'
-
-const upload = multer({dest: 'uploads/'});
 
 // Add tasks for students: /api/tasks/add
 export const addTask = async (req, res)=>{
@@ -99,17 +93,17 @@ export const uploadProof = async (req, res) => {
         if (!task){
             return res.status(404).json({ success: false, message: "Task not found" })
         }
-        if (task.proofUrl){
-            const oldPath = path.join(process.cwd(), task.proofUrl);
-            fs.unlink(oldPath, err => {
-                // Ignore error if file doesn't exist
-            });
+        
+        // Handle memory storage - convert to base64 for storage
+        if (req.file) {
+            const base64Image = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+            task.proofUrl = base64Image;
+            task.status = 'submitted';
+            await task.save();
+            res.json({ success: true, message: "Proof uploaded", task });
+        } else {
+            res.status(400).json({ success: false, message: "No file uploaded" });
         }
-        // Save file path
-        task.proofUrl = `/uploads/${req.file.filename}`;
-        task.status = 'submitted';
-        await task.save();
-        res.json({ success: true, message: "Proof uploaded", task });
     } catch (error) {
         res.status(500).json({success: false, message: 'Error in uploadProof'})
         console.log(error.message)
@@ -127,9 +121,9 @@ export const removeProof = async (req, res) => {
         if (!task){
             return res.status(404).json({ success: false, message: "Task not found" })
         }
+        
+        // For base64 storage, just clear the field
         if (task.proofUrl) {
-            const oldPath = path.join(process.cwd(), task.proofUrl);
-            fs.unlink(oldPath, err => {});
             task.proofUrl = undefined;
             task.status = 'pending';
             await task.save();
