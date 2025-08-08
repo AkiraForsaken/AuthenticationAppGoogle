@@ -16,12 +16,24 @@ const port = process.env.PORT || 5000;
 
 await connectDB();
 
-const allowedOrigins = ['http://localhost:5173'];
+const allowedOrigins = [
+  'http://localhost:5173'
+];
 
 app.use(express.json());
 app.use(cookieParser());
+// app.use(cors({
+//   origin: allowedOrigins,
+//   credentials: true,
+// }));
 app.use(cors({
-  origin: allowedOrigins,
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1){
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
 }));
 // app.use('/uploads', express.static(path.join(process.cwd(), 'uploads'))); 
@@ -35,6 +47,15 @@ app.use('/api/auth', authRouter);
 app.use('/api/users', userRouter);
 app.use('/api/tasks', taskRouter);
 app.use('/api/notifications', notificationRouter);
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ 
+    success: false, 
+    message: process.env.NODE_ENV === 'production' 
+      ? 'Internal server error' 
+      : err.message 
+  });
+});
 
 app.listen(port, ()=>{
   console.log(`Server is runnning on localhost:${port}`)

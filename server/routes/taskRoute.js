@@ -15,8 +15,22 @@ const storage = multer.diskStorage({
     cb(null, Date.now() + '-' + Math.round(Math.random() * 1E9) + ext);
   }
 });
-const upload = multer({ storage });
 // const upload = multer({dest: 'uploads/'})
+// const upload = multer({ storage });
+const upload = multer({
+  storage,
+  fileFilter: (req, file, cb) => {
+    // Only allow images
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed!'), false);
+    }
+  },
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+  }
+});
 const taskRouter = express.Router();
 
 taskRouter.post('/add', authUser, addTask);
