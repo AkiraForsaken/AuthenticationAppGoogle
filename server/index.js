@@ -21,8 +21,8 @@ const allowedOrigins = [
   'http://localhost:5173',
   'https://authentication-app-google.vercel.app',
   'https://authentication-app-google.vercel.app/',
-  'https://authentication-app-google-frontend.vercel.app',
-  'https://authentication-app-google-frontend.vercel.app/'
+  'https://authentication-app-google-7k0p28xef-akirasejis-projects.vercel.app',
+  'https://authentication-app-google-7k0p28xef-akirasejis-projects.vercel.app/'
 ];
 
 app.use(express.json());
