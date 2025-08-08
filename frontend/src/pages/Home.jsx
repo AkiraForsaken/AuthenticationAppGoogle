@@ -23,9 +23,19 @@ const Home = () => {
     // Temporary test function
     const testBackend = async () => {
       try {
+        console.log('Testing backend connection...');
         const res = await axios.get('/api/health');
         console.log('Backend test successful:', res.data);
-        alert('Backend connection successful!');
+        
+        // Also test CORS endpoint
+        try {
+          const corsRes = await axios.get('/api/cors-test');
+          console.log('CORS test successful:', corsRes.data);
+          alert('Backend connection successful!\nCORS is working properly.');
+        } catch (corsError) {
+          console.error('CORS test failed:', corsError);
+          alert('Backend connection successful, but CORS might have issues.');
+        }
       } catch (error) {
         console.error('Backend test failed:', error);
         alert('Backend connection failed: ' + error.message);

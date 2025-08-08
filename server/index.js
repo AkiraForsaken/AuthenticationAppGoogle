@@ -16,25 +16,47 @@ const port = process.env.PORT || 5000;
 
 await connectDB();
 
-// More flexible CORS configuration
+// More flexible CORS configuration - allow all Vercel domains
 const allowedOrigins = [
   'http://localhost:5173',
   'https://authentication-app-google.vercel.app',
   'https://authentication-app-google.vercel.app/',
   'https://authentication-app-google-7k0p28xef-akirasejis-projects.vercel.app',
-  'https://authentication-app-google-7k0p28xef-akirasejis-projects.vercel.app/'
+  'https://authentication-app-google-7k0p28xef-akirasejis-projects.vercel.app/',
+  'https://authentication-app-google-qgzjbf0ed-akirasejis-projects.vercel.app',
+  'https://authentication-app-google-qgzjbf0ed-akirasejis-projects.vercel.app/'
 ];
 
 app.use(express.json());
 app.use(cookieParser());
 
-// Updated CORS configuration
+// Updated CORS configuration - allow all Vercel subdomains
 app.use(cors({
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
+    if (!origin) {
+      console.log('Allowing request with no origin');
+      return callback(null, true);
+    }
     
+    console.log('Checking CORS for origin:', origin);
+    
+    // Allow localhost for development
+    if (origin.startsWith('http://localhost:')) {
+      console.log('Allowing localhost origin');
+      return callback(null, true);
+    }
+    
+    // Allow all Vercel domains (production and preview deployments)
+    // This covers all patterns: *.vercel.app, *.vercel.app/, and any subdomain
+    if (origin.includes('vercel.app') || origin.includes('vercel.app/')) {
+      console.log('Allowing Vercel domain:', origin);
+      return callback(null, true);
+    }
+    
+    // Check specific allowed origins
     if (allowedOrigins.indexOf(origin) !== -1) {
+      console.log('Allowing specific origin:', origin);
       callback(null, true);
     } else {
       console.log('Blocked by CORS:', origin);
@@ -55,6 +77,16 @@ app.get('/api/health', (req, res) => {
     message: 'Backend is healthy',
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV
+  });
+});
+
+// CORS test endpoint
+app.get('/api/cors-test', (req, res) => {
+  res.json({ 
+    success: true, 
+    message: 'CORS test successful',
+    origin: req.headers.origin,
+    timestamp: new Date().toISOString()
   });
 });
 
