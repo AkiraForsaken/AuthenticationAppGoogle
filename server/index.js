@@ -18,7 +18,7 @@ await connectDB();
 
 const allowedOrigins = [
   'http://localhost:5173',
-  'https://authentication-app-backend-2ra3.onrender.com' // Add your Vercel frontend URL here
+  'https://authentication-app-google.vercel.app' // Add your Vercel frontend URL here
 ];
 
 app.use(express.json());
