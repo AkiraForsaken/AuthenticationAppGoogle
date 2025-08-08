@@ -83,6 +83,7 @@ const Navbar = () => {
               text="signin_with"
               logo_alignment="left"
               ux_mode="popup"
+              useOneTap={false}
               onSuccess={async credentialResponse => {
                 try {
                   const res = await axios.post('/api/auth/google', {

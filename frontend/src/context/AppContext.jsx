@@ -4,9 +4,38 @@ import toast from "react-hot-toast";
 import axios from "axios";
 
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = process.env.NODE_ENV === 'production' 
-                            ? import.meta.env.VITE_BACKEND_URL || 'https://your-app-name.onrender.com'
-                            : 'http://localhost:5000';
+
+// Better backend URL configuration
+const getBackendURL = () => {
+  if (process.env.NODE_ENV === 'production') {
+    return import.meta.env.VITE_BACKEND_URL || 'https://authentication-app-backend-2ra3.onrender.com';
+  }
+  return 'http://localhost:5000';
+};
+
+axios.defaults.baseURL = getBackendURL();
+
+// Add request interceptor for debugging
+axios.interceptors.request.use(
+  (config) => {
+    console.log('Making request to:', config.baseURL + config.url);
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Add response interceptor for debugging
+axios.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    console.error('Request failed:', error.response?.data || error.message);
+    return Promise.reject(error);
+  }
+);
 
 export const AppContext = createContext();
 
@@ -60,15 +89,18 @@ export const AppContextProvider = ({children})=>{
 
     const fetchUserList = async ()=>{
         try {
+            console.log('Fetching user list...');
             const res = await axios.get('/api/users/list');
             if (res.data.success){
                 setUserList(res.data.users);
-                // console.log(res.data.users);
+                console.log('User list fetched successfully:', res.data.users.length, 'users');
             } else {
+                console.error('Failed to fetch user list:', res.data.message);
                 toast.error(res.data.message);
             }
         } catch (error) {
-            toast.error(error.message);
+            console.error('Error fetching user list:', error);
+            toast.error(error.response?.data?.message || 'Failed to fetch user list');
         }
     }
 

@@ -16,29 +16,47 @@ const port = process.env.PORT || 5000;
 
 await connectDB();
 
+// More flexible CORS configuration
 const allowedOrigins = [
   'http://localhost:5173',
-  'https://authentication-app-google.vercel.app' // Add your Vercel frontend URL here
+  'https://authentication-app-google.vercel.app',
+  'https://authentication-app-google.vercel.app/',
+  'https://authentication-app-google-frontend.vercel.app',
+  'https://authentication-app-google-frontend.vercel.app/'
 ];
 
 app.use(express.json());
 app.use(cookieParser());
-// app.use(cors({
-//   origin: allowedOrigins,
-//   credentials: true,
-// }));
+
+// Updated CORS configuration
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.indexOf(origin) !== -1){
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
+      console.log('Blocked by CORS:', origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
 app.get('/', (req, res) => res.send('API is working'));
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    success: true, 
+    message: 'Backend is healthy',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV
+  });
+});
 
 // Test endpoint for Render deployment
 app.get('/api/test', (req, res) => {

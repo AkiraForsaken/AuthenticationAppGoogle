@@ -18,7 +18,20 @@ const features = [
 ]
 
 const Home = () => {
-    const { user, navigate } = useAppContext();
+    const { user, navigate, axios } = useAppContext();
+    
+    // Temporary test function
+    const testBackend = async () => {
+      try {
+        const res = await axios.get('/api/health');
+        console.log('Backend test successful:', res.data);
+        alert('Backend connection successful!');
+      } catch (error) {
+        console.error('Backend test failed:', error);
+        alert('Backend connection failed: ' + error.message);
+      }
+    };
+
   return (
     <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 900, py: 5, bgcolor: 'mainBg.main'}}>
       <Typography variant="h2" fontWeight={700} sx={{mb: 4, textAlign: 'center', color: 'mainBg.contrastText'}}>
@@ -28,6 +41,16 @@ const Home = () => {
         Get your students on track to greatness! 
         Assign, monitor, and complete daily tasks with ease.
       </Typography>
+      
+      {/* Temporary test button */}
+      <Button 
+        variant="outlined" 
+        onClick={testBackend}
+        sx={{mb: 4}}
+      >
+        Test Backend Connection
+      </Button>
+      
       <Grid container spacing={4} justifyContent="center" sx={{mb: 4, gap: 4}}>
         {features.map((feature, i) => (
           <Grid key={i}>
@@ -47,7 +70,7 @@ const Home = () => {
       <Button variant="contained" color="primary" size="large" 
       disabled={!user} onClick={()=>navigate('dashboard')} sx={{p: 2, borderRadius: 5}}
       >
-        Get Started
+        {user ? 'Go to Dashboard' : 'Login to Get Started'}
       </Button>
     </Box>
   )
