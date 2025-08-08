@@ -120,11 +120,12 @@ const VerifyTask = () => {
             <Typography>No tasks for this student.</Typography>
           )}
           {!loading && selectedUserId && Object.entries(tasksByDate).map(([date, tasks]) => (
-            <Box key={date} sx={{ mt: 2 }}>
+            <div key={date} className='mt-2'>
               <Typography fontSize={20} fontWeight={600}>{date}</Typography>
               <List>
                 {tasks.map(task => ( // mapping each tasks for a given date
                   <ListItem key={task._id} disableGutters
+                    sx={{pt: 0}}
                     secondaryAction={ 
                       <Button
                         variant="contained"
@@ -137,7 +138,7 @@ const VerifyTask = () => {
                       </Button>
                     }
                   >
-                    <Box>
+                    <div>
                       <Typography>{task.name}</Typography>
                       <span>Status: {task.status}</span>
                       <br />
@@ -149,9 +150,9 @@ const VerifyTask = () => {
                         <>
                           <br />
                           <Button
-                            variant="outlined"
+                            variant='contained'
                             size="small"
-                            sx={{ mt: 1, mb: 1 }}
+                            sx={{ my: 1, p: 0.5 }}
                             onClick={() => setVisibleProofId(visibleProofId === task._id ? null : task._id)}
                           >
                             {visibleProofId === task._id ? 'Hide Proof' : 'Show Proof'}
@@ -166,11 +167,11 @@ const VerifyTask = () => {
                           )}
                         </>
                       )}
-                    </Box>
+                    </div>
                   </ListItem>
                 ))}
               </List>
-            </Box>
+            </div>
           ))}
         </CardContent>
       </Card>

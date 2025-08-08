@@ -100,7 +100,9 @@ const ManageTasks = () => {
             </Select>
           </FormControl>
           <Box mt={2}>
-            <Button type="submit" variant="contained" color="primary" fullWidth>Create Task</Button>
+            <Button type="submit" variant="contained" sx={{p: 1}} fullWidth>
+              <span className='text-lg'>Create Task</span>
+            </Button>
           </Box>
         </form>
       </CardContent>

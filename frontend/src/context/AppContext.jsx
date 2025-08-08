@@ -14,9 +14,12 @@ export const AppContextProvider = ({children})=>{
     const [userTasks, setUserTasks] = useState([]); // Stores the current user's tasks
     const [userList, setUserList] = useState([]); // Stores user list from backend for admin to use
     const [isAdmin, setIsAdmin] = useState(false);
-    const [allTasks, setAllTasks] = useState([]);
+    const [darkMode, setDarkMode] = useState(()=> {
+        const stored = localStorage.getItem('darkMode');
+        return stored ? JSON.parse(stored) : false;
+    });
     
-    const value = {navigate, user, setUser, isAdmin, setIsAdmin, userList, setUserList, userTasks, setUserTasks, axios, allTasks};
+    const value = {navigate, user, setUser, isAdmin, setIsAdmin, userList, setUserList, userTasks, setUserTasks, axios, darkMode, setDarkMode};
 
     const fetchUser = async ()=>{
         try {
@@ -44,7 +47,7 @@ export const AppContextProvider = ({children})=>{
             const res = await axios.get('/api/tasks/get');
             if (res.data.success){
                 setUserTasks(res.data.tasks);
-                console.log("Tasks fetched", res.data.tasks);
+                // console.log("Tasks fetched", res.data.tasks);
             } else {
                 toast.error(res.data.message);
             }
@@ -84,7 +87,7 @@ export const AppContextProvider = ({children})=>{
     // Because all fetch functions are async, it sets states (e.g user and isAdmin) after the effect runs
     useEffect(()=>{
         fetchUser()
-    },[])
+    },[]);
 
     useEffect(() => {
         // Fetch functions
@@ -96,7 +99,10 @@ export const AppContextProvider = ({children})=>{
             // fetchAllTasks();
         }
     },[user, isAdmin]);
-    
+
+    useEffect(() => {
+        localStorage.setItem('darkMode', JSON.stringify(darkMode));
+    }, [darkMode]);
 
     return <AppContext.Provider value={value}>
         {children}

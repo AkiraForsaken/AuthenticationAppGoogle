@@ -7,6 +7,8 @@ import AssignmentIcon from '@mui/icons-material/Assignment'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import GroupIcon from '@mui/icons-material/Group'
 import PersonAddIcon from '@mui/icons-material/PersonAdd'
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
 import LogoutIcon from '@mui/icons-material/Logout'
 
 const sidebarLinks = [
@@ -18,7 +20,7 @@ const sidebarLinks = [
 const drawerWidth = 220
 
 const Admin = () => {
-  const { axios, user, setUser, setIsAdmin } = useAppContext()
+  const { axios, user, setUser, setIsAdmin,darkMode, setDarkMode } = useAppContext()
   const navigate = useNavigate()
 
   const logout = async () => {
@@ -37,7 +39,7 @@ const Admin = () => {
   }
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'mainBg.light' }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'mainBg.main' }}>
       {/* Sidebar */}
       <Drawer
         variant="permanent"
@@ -48,7 +50,8 @@ const Admin = () => {
         }}
       >
         <Toolbar sx={{ minHeight: 64, bgcolor: 'mainBg.white' }} />
-        <Box sx={{ overflow: 'auto', mt: 2, bgcolor: 'mainBg.white' }}>
+        <Box sx={{ overflow: 'auto', mt: 2 }}>
+          {/* Sidebar Links */}
           <List>
             {sidebarLinks.map((item) => (
               <ListItem
@@ -57,10 +60,10 @@ const Admin = () => {
                 to={item.path}
                 end={item.path === '/admin'}
                 sx={({ isActive }) => ({
-                  bgcolor: isActive ? 'primary.light' : 'inherit',
-                  color: isActive ? 'primary.main' : 'inherit',
-                  borderLeft: isActive ? '4px solid #1976d2' : '4px solid transparent',
-                  '&:hover': { bgcolor: '#f5f5f5' },
+                  // bgcolor: isActive ? 'primary.light' : 'inherit',
+                  // color: isActive ? 'primary.main' : 'inherit',
+                  borderRight: isActive ? '4px solid #1976d2' : '4px solid #fff',
+                  '&:hover': { bgcolor: ` ${darkMode ? '#213f77ff' : '#a9bfd1ff'}` },
                 })}
               >
                 <ListItemIcon sx={{ color: 'inherit' }}>{item.icon}</ListItemIcon>
@@ -82,6 +85,10 @@ const Admin = () => {
               <Typography fontSize={20} color="mainBg.whiteText"> 
                 Hello Admin {user ? user.name : null}
               </Typography>
+              {/* Dark mode button */}
+              <IconButton sx={{ ml: 1 }} onClick={()=>setDarkMode(!darkMode)} color="inherit">
+                {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
+              </IconButton>
               <Button variant="contained" color="primary" startIcon={<LogoutIcon />} onClick={logout}>
                 Logout
               </Button>

@@ -65,7 +65,7 @@ function groupTasksByWeek(tasks, weekDates) {
 }
 
 const Dashboard = () => {
-  const { userTasks, axios } = useAppContext(); 
+  const { userTasks, axios, darkMode } = useAppContext(); 
   // Week navigation state
   const [weekOffset, setWeekOffset] = useState(0)
   const today = new Date()
@@ -170,7 +170,7 @@ const Dashboard = () => {
         display: 'flex',
         flexDirection: { xs: 'column', md: 'row' },
         gap: { xs: 2, md: 10 },
-        bgcolor: 'mainBg.light', 
+        bgcolor: 'mainBg.main', 
         minHeight: '100vh',
         py: { xs: 2, md: 8 },
         px: { xs: 1, md: 4 },
@@ -178,8 +178,11 @@ const Dashboard = () => {
     >
       {/* ------------------- Week navigation (top on mobilem, right on pc) -------------------*/}
       <Box sx={{ flex: 1, minWidth: { xs: '100%', md: 300 }, mb: { xs: 2, md: 0 }, order: { xs: 0, md: 1 }}}>
-        <Card sx={{ p: 2, mb: 2, bgcolor: 'card.main' }}>
-          <CardContent sx={{color: 'card.contrastText'}}>
+        <Card 
+        sx={{ p: 2, mb: 2, bgcolor: 'card.main' }}
+        >
+          <CardContent 
+          sx={{color: 'card.contrastText'}}>
             <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2, textAlign: 'center'}}>
               Week
             </Typography>
@@ -191,7 +194,9 @@ const Dashboard = () => {
           </CardContent>
         </Card>
         {/* Mini Calendar */}
-        <Card sx={{ p: 2, bgcolor: 'card.main', color: 'card.contrastText' }}>
+        <Card 
+        sx={{ p: 2, bgcolor: 'card.main', color: 'card.contrastText'}}
+        >
           <Typography variant="h6" fontWeight={600} sx={{ mb: 3, textAlign: 'center' }}>
             {baseDate.toLocaleString('default', { month: 'long' })} {calendarYear}
           </Typography>
@@ -200,8 +205,8 @@ const Dashboard = () => {
               <Typography key={i} variant="body1" align="center" sx={{ fontWeight: 600 }}>{d}</Typography>
             ))}
             {calendarMatrix.flat().map((date, i) => {
-              const highlightWeek = isInCurrentWeek(date)
-              const highlightDay = isToday(date)
+              const highlightWeek = isInCurrentWeek(date);
+              const highlightDay = isToday(date);
               return (
                 <Box
                   key={i}
@@ -211,11 +216,17 @@ const Dashboard = () => {
                     alignItems: 'center',
                     justifyContent: 'center',
                     borderRadius: '50%',
-                    bgcolor: highlightDay ? 'primary.main' : highlightWeek ? 'primary.light' : undefined,
-                    color: highlightDay ? 'white' : highlightWeek ? 'primary.dark' : undefined,
-                    border: highlightWeek ? '2px solid #ffbbd7ff' : undefined,
-                    fontWeight: highlightDay ? 700 : 400,
-                    m: 0.2,
+                    bgcolor: 
+                      highlightDay ? 'primary.dark' : 
+                      highlightWeek ? 'primary.light' : undefined,
+                    color: 
+                      highlightDay ? 'white' : 
+                      highlightWeek ? 'card.highlightText' : undefined,
+                    border: 
+                      highlightDay ? `2px solid ${darkMode ? '#ffbbd7ff' : '#c69afeff'}`: 
+                      highlightWeek ? `2px solid ${darkMode ? '#0c6d85ff' : '#ffaef3ff'}`: undefined,
+                    fontWeight: highlightDay ? 700 : 500,
+                    m: 0.4,
                   }}
                 >
                   {date ? date.getDate() : ''}
@@ -246,8 +257,8 @@ const Dashboard = () => {
                   transition: 'box-shadow 0.2s',
                   '&:hover': { boxShadow: 8 },
                   color: !isToday(date) ? 'card.contrastText' : 'card.highlightText',
-                  bgcolor: !isToday(date) ? 'card.main' : 'card2',
-                  border: isToday(date) ? '2px solid #000000ff' : 'none',
+                  bgcolor: !isToday(date) ? 'card.main' : 'card.secondary',
+                  border: isToday(date) ? `2px solid ${darkMode ? '#fff' : '#000000ff'}` : 'none',
                 }}
                 onClick={() => handleDayDialogOpen(idx)}
               >
@@ -278,18 +289,20 @@ const Dashboard = () => {
               <React.Fragment key={task._id}>
                 <ListItem
                   className='cursor-pointer'
+                  sx={{p: 2}}
                   button
                   onClick={() => setExpandedTaskId(expandedTaskId === task._id ? null : task._id)} // this onclick turns the collapse element on or off depending on if its current state
                   disableGutters
                   secondaryAction={
                     <Button
-                      variant="outlined"
+                      variant="contained"
                       size="small"
                       onClick={e => {
                         e.stopPropagation(); // Prevent expanding when clicking button
                         handleProofOpen(task);
                       }}
                       disabled={task.status === 'completed' || !!task.proofUrl}
+                      sx={{mr: 2}}
                     >
                       {task.status === 'completed' ? 'Completed' : 'Send Proof'}
                     </Button>
@@ -302,7 +315,7 @@ const Dashboard = () => {
                   />
                 </ListItem>
                 {/* Collapse component: the props "in" if true reveals the component */}
-                <Collapse in={expandedTaskId === task._id} timeout="auto" unmountOnExit className='mt-4'>
+                <Collapse in={expandedTaskId === task._id} timeout="auto" unmountOnExit sx={{mt: 2}}>
                   <Box sx={{ pl: 4, pr: 2, pb: 2 }}>
                     <Typography variant="body2" color="text.secondary">
                       {task.instructions}
@@ -312,7 +325,7 @@ const Dashboard = () => {
               </React.Fragment>
             ))}
           </List>
-          <Button onClick={handleDayDialogClose} variant="contained" color="primary" className="mt-4" fullWidth>Close</Button>
+          <Button onClick={handleDayDialogClose} variant="contained" color="primary" sx={{mt: 2, p: 2}} fullWidth>Close</Button>
         </DialogContent>
       </Dialog>
 
@@ -320,7 +333,6 @@ const Dashboard = () => {
       <Dialog open={proofOpen} onClose={handleProofClose} maxWidth="xs" fullWidth>
         <DialogTitle>Send Proof for: {selectedTask?.text}</DialogTitle>
         <DialogContent>
-          {/* DUMMY: No real upload, just a file input */}
           <form onSubmit={handleProofSubmit} className="flex flex-col gap-4 mt-2">
             <Button variant="contained" component="label">
               Upload Image

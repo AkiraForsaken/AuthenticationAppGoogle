@@ -2,12 +2,15 @@ import React, { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAppContext } from '../context/AppContext.jsx'
 import { AppBar, Toolbar, Box, Avatar, Menu, MenuItem, IconButton, Typography, Button } from '@mui/material'
+// import { Brightness4Icon, Brightness7Icon } from '@mui/icons-material'
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
 import { GoogleLogin } from '@react-oauth/google'
 import profileIcon from '../assets/profile_icon.png'
 import toast from 'react-hot-toast'
 
 const Navbar = () => {
-  const { axios, user, setUser, isAdmin, setIsAdmin } = useAppContext();
+  const { axios, user, setUser, isAdmin, setIsAdmin, darkMode, setDarkMode } = useAppContext();
   const navigate = useNavigate();
   // Dummy user for demonstration
   // const user = { name: 'John Doe', email: 'john@example.com', picture: profileIcon };
@@ -63,6 +66,10 @@ const Navbar = () => {
           sx={{ p: 1, maxWidth: 150, textAlign: 'center', fontWeight: 500, textTransform: 'none', color: 'mainBg.contrastText'}}> 
             <span className='text-lg'>Do exercises here</span> 
           </Button>
+          {/* Dark mode button */}
+          <IconButton sx={{ ml: 1 }} onClick={()=>setDarkMode(!darkMode)} color="inherit">
+            {darkMode ? <Brightness7Icon /> : <Brightness4Icon />}
+          </IconButton>
           {/* Google login button or user profile */}
           {!user ? (
             <Box sx={{ ml: 1 }}>
@@ -104,8 +111,11 @@ const Navbar = () => {
           ) : (
             <>
               <IconButton onClick={handleMenu} size="small" sx={{ ml: 2 }}>
-                <Avatar src={user.picture || profileIcon} alt={user.name} 
-                sx={{ width: 36, height: 36, mr: 2 }} />
+                <Avatar 
+                  src={user.picture ? `${import.meta.env.VITE_BACKEND_URL}${user.picture}` : profileIcon} 
+                  alt={user.name} 
+                  sx={{ width: 36, height: 36, mr: 2 }} 
+                />
               </IconButton>
               <Menu
                 anchorEl={anchorEl}

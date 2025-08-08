@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken'
 // Add new users (admin / students): /api/users/add
 export const addUsers = async (req, res)=>{
     try {
-        const {email, name, role, picture} = req.body;
+        const {email, name, role, picture, phoneNumber, birthDate} = req.body;
         if (!name || !email || !role){
             return res.json({success:false, message: "Missing details"})
         }
@@ -15,7 +15,25 @@ export const addUsers = async (req, res)=>{
             return res.json({success:false, message: "User already exists!"});
         }
 
-        const user = await User.create({name, email, picture, role, status: 'invited'});
+        const userData = {
+            name, 
+            email, 
+            role, 
+            status: 'invited'
+        };
+
+        // Add optional fields if provided
+        if (phoneNumber) userData.phoneNumber = phoneNumber;
+        if (birthDate) userData.birthDate = new Date(birthDate);
+        
+        // Handle picture upload if file is provided
+        if (req.file) {
+            userData.picture = `/uploads/${req.file.filename}`;
+        } else if (picture) {
+            userData.picture = picture;
+        }
+
+        const user = await User.create(userData);
 
         return res.json({success: true, message: "User added successfully", user});
     } catch (error) {
@@ -70,7 +88,7 @@ export const getUserList = async(req, res)=>{
 // Update user info: /api/users/update
 export const updateUserInfo = async (req, res)=>{
     try {
-        const { name, socialLinks } = req.body;
+        const { name, socialLinks, phoneNumber, birthDate } = req.body;
         const user = await User.findById(req.userId);
         if (!user) {
             return res.status(404).json({success: false, message: "No user found"});
@@ -80,6 +98,12 @@ export const updateUserInfo = async (req, res)=>{
         }
         if (socialLinks) {
             user.socialLinks = socialLinks;
+        }
+        if (phoneNumber !== undefined) {
+            user.phoneNumber = phoneNumber;
+        }
+        if (birthDate) {
+            user.birthDate = new Date(birthDate);
         }
         await user.save();
         res.json({success: true, user, message: "Update information successfully"})

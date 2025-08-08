@@ -1,0 +1,1 @@
+npm i @mui/material @mui/x-date-pickers @mui/icons-material @emotion/react @emotion/styled @react-oauth/google @tailwindcss/vite axios date-fns jwt-decode react-hot-toast react-router-dom tailwindcss
