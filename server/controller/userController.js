@@ -1,5 +1,7 @@
 import User from '../models/User.js'
-import jwt from 'jsonwebtoken'
+import cloudinary from '../config/cloudinary.js';
+import fs from 'fs'
+import { upload } from '../config/multer.js';
 
 
 // Add new users (admin / students): /api/users/add
@@ -28,7 +30,14 @@ export const addUsers = async (req, res)=>{
         
         // Handle picture upload if file is provided
         if (req.file) {
-            userData.picture = `/uploads/${req.file.filename}`;
+            const result = await cloudinary.uploader.upload(req.file.path, {
+                folder: 'profile_pictures',
+                public_id: `${email}_${Date.now()}`,
+                overwrite: true,
+                resource_type: 'image'
+            });
+            userData.picture = result.secure_url;
+            fs.unlink(req.file.path, () => {});
         } else if (picture) {
             userData.picture = picture;
         }
@@ -141,7 +150,19 @@ export const uploadPicture = async (req, res)=>{
         if (!user){
             return res.status(404).json({ success: false, message: "User not found"})
         }
-        user.picture = `/uploads/${req.file.filename}`;
+        if (!req.file) {
+            return res.status(400).json({ success: false, message: "No file uploaded" });
+        }
+        // Implement uploading picture to cloudinary and saving the image to the user on mongoDB database here
+        // Upload to Cloudinary
+        const result = await cloudinary.uploader.upload(req.file.path, {
+            folder: 'profile_pictures',
+            public_id: `${user._id}_${Date.now()}`,
+            overwrite: true,
+            resource_type: 'image'
+        });
+        user.picture = result.secure_url;
+        fs.unlink(req.file.path, () => {});
         await user.save();
         res.json({success: true, user, url: user.picture})
     } catch (error) {

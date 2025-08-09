@@ -1,9 +1,10 @@
 import express from 'express'
 import {addUsers, isAuth, logout, getUserList, updateUserInfo, uploadPicture, getTasksForUser} from '../controller/userController.js'
 import authUser from '../middleware/authUser.js'
-import multer from 'multer';
+// import multer from 'multer';
+import { upload } from '../config/multer.js'
 
-const upload = multer({dest: 'uploads/'});  // configure to upload profile picture
+// const upload = multer({dest: 'uploads/'});  // configure to upload profile picture
 const userRouter = express.Router();
 
 userRouter.post('/add', addUsers);

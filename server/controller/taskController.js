@@ -2,9 +2,26 @@ import Task from '../models/Task.js'
 import User from '../models/User.js'
 import Notification from '../models/Notification.js'
 import multer from 'multer'
+import cloudinary from '../config/cloudinary.js'
 import fs from 'fs'
-import path from 'path'
-import process from 'process'
+// import path from 'path'
+// import process from 'process'
+
+// Helper to extract public_id from a Cloudinary URL
+function getCloudinaryPublicId(url) {
+    // Example: https://res.cloudinary.com/<cloud_name>/image/upload/v1234567890/task_proofs/abc123.jpg
+    // We want: task_proofs/abc123
+    try {
+        const parts = url.split('/');
+        const folderIndex = parts.findIndex(p => p === 'upload') + 1;
+        // Remove extension
+        const fileWithExt = parts.slice(folderIndex).join('/');
+        const file = fileWithExt.replace(/\.[^/.]+$/, "");
+        return file;
+    } catch {
+        return null;
+    }
+}
 
 const upload = multer({dest: 'uploads/'});
 
@@ -99,14 +116,38 @@ export const uploadProof = async (req, res) => {
         if (!task){
             return res.status(404).json({ success: false, message: "Task not found" })
         }
-        if (task.proofUrl){
+        // Remove old proof from Cloudinary if exists
+        if (task.proofUrl && task.proofUrl.startsWith('http')) {
+            // Optionally: extract public_id and delete from Cloudinary
+            const publicId = getCloudinaryPublicId(task.proofUrl);
+            if (publicId) {
+                try {
+                    await cloudinary.uploader.destroy(publicId, { resource_type: 'image' });
+                } catch (err) {
+                    console.log('Cloudinary destroy error:', err.message);
+                }
+            }
+        }
+        /* if (task.proofUrl){
             const oldPath = path.join(process.cwd(), task.proofUrl);
             fs.unlink(oldPath, err => {
                 // Ignore error if file doesn't exist
             });
+        } */
+        if (!req.file) {
+            return res.status(400).json({ success: false, message: "No file uploaded" });
         }
-        // Save file path
-        task.proofUrl = `/uploads/${req.file.filename}`;
+        // Upload new proof to Cloudinary
+        const result = await cloudinary.uploader.upload(req.file.path, {
+            folder: 'task_proofs',
+            public_id: `${task._id}_${Date.now()}`,
+            overwrite: true,
+            resource_type: 'image'
+        });
+        // Remove local file
+        fs.unlink(req.file.path, () => {});
+        // Save Cloudinary URL
+        task.proofUrl = result.secure_url;
         task.status = 'submitted';
         await task.save();
         res.json({ success: true, message: "Proof uploaded", task });
@@ -127,13 +168,21 @@ export const removeProof = async (req, res) => {
         if (!task){
             return res.status(404).json({ success: false, message: "Task not found" })
         }
-        if (task.proofUrl) {
-            const oldPath = path.join(process.cwd(), task.proofUrl);
-            fs.unlink(oldPath, err => {});
-            task.proofUrl = undefined;
-            task.status = 'pending';
-            await task.save();
+        if (task.proofUrl && task.proofUrl.includes('cloudinary.com')) {
+            // const oldPath = path.join(process.cwd(), task.proofUrl);
+            // fs.unlink(oldPath, err => {});
+            const publicId = getCloudinaryPublicId(task.proofUrl);
+            if (publicId) {
+                try {
+                    await cloudinary.uploader.destroy(publicId, { resource_type: 'image' });
+                } catch (err) {
+                    console.log('Cloudinary destroy error:', err.message);
+                }
+            }
         }
+        task.proofUrl = undefined;
+        task.status = 'pending';
+        await task.save();
         res.json({ success: true, message: "Proof removed", task });
     } catch (error) {
         res.status(500).json({success: false, message: 'Error in removeProof'})

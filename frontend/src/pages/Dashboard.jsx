@@ -1,7 +1,9 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Grid, Card, CardContent, Typography, Dialog, DialogTitle, DialogContent, Button, List, ListItem, ListItemText, Box, IconButton, Collapse } from '@mui/material'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
+import DialogActions from '@mui/material/DialogActions'
+import CloseIcon from '@mui/icons-material/Close'
 import { dummyTasks } from '../assets/assets'
 import { useAppContext } from '../context/AppContext'
 import toast from 'react-hot-toast'
@@ -65,7 +67,7 @@ function groupTasksByWeek(tasks, weekDates) {
 }
 
 const Dashboard = () => {
-  const { userTasks, axios, darkMode } = useAppContext(); 
+  const { userTasks, axios, darkMode, fetchTasks } = useAppContext(); 
   // Week navigation state
   const [weekOffset, setWeekOffset] = useState(0)
   const today = new Date()
@@ -82,12 +84,18 @@ const Dashboard = () => {
   const [proofOpen, setProofOpen] = useState(false)
   const [selectedTask, setSelectedTask] = useState(null)
   const [proofFile, setProofFile] = useState(null)
+  const [proofChanged, setProofChanged] = useState(false);
 
   // Expand task to see intruction state
   const [expandedTaskId, setExpandedTaskId] = useState(null)
 
+  // Proof image preview state
+  const [imageModalOpen, setImageModalOpen] = useState(false);
+  const [modalImageUrl, setModalImageUrl] = useState('');
+  const [proofPreviewUrl, setProofPreviewUrl] = useState(null);
+
   // DUMMY: For now, tasks are static per week (Updated)
-  const tasks = dummyTasks;
+  // const tasks = dummyTasks;
   const tasksByDay = groupTasksByWeek(userTasks, weekDates);
 
   // Open dialog for day card
@@ -111,6 +119,17 @@ const Dashboard = () => {
     setProofFile(null)
   }
 
+  // Handle file selection and preview
+  const handleProofFileChange = (e) => {
+    const file = e.target.files[0];
+    setProofFile(file);
+    if (file) {
+      setProofPreviewUrl(URL.createObjectURL(file));
+    } else {
+      setProofPreviewUrl(null);
+    }
+  };
+
   // Handle proof upload (Updated)
   const handleProofSubmit = async (e) => {
     e.preventDefault();
@@ -126,6 +145,7 @@ const Dashboard = () => {
       });
       if (res.data.success){
         toast.success('Proof submitted success');
+        setProofChanged(true);
       } else {
         toast.error(res.data.message);
       }
@@ -135,6 +155,32 @@ const Dashboard = () => {
     }
     handleProofClose();
   }
+
+  const handleRemoveProof = async () => {
+    if (!selectedTask) return;
+    try {
+      const res = await axios.post(`/api/tasks/remove-proof/${selectedTask._id}`);
+      if (res.data.success) {
+        toast.success('Proof removed');
+        setProofChanged(true); // trigger refresh
+      } else {
+        toast.error(res.data.message);
+      }
+    } catch (error) {
+      toast.error('Failed to remove proof');
+    }
+    handleProofClose();
+  };
+
+  // Open image modal
+  const handleImageModalOpen = (url) => {
+    setModalImageUrl(url);
+    setImageModalOpen(true);
+  };
+  const handleImageModalClose = () => {
+    setImageModalOpen(false);
+    setModalImageUrl('');
+  };
 
   // Week navigation
   const handlePrevWeek = () => setWeekOffset(weekOffset - 1)
@@ -163,6 +209,13 @@ const Dashboard = () => {
     d1.getDate() === d2.getDate()}
   const isInCurrentWeek = (date) => weekDates.some(wd => isSameDay(wd, date))
   const isToday = (date) => isSameDay(date, today)
+
+  useEffect(()=>{
+    if (proofChanged){
+      fetchTasks();
+      setProofChanged(false);
+    }
+  }, [proofChanged, fetchTasks])
 
   return (
     <Box
@@ -290,22 +343,45 @@ const Dashboard = () => {
                 <ListItem
                   className='cursor-pointer'
                   sx={{p: 2}}
-                  button
                   onClick={() => setExpandedTaskId(expandedTaskId === task._id ? null : task._id)} // this onclick turns the collapse element on or off depending on if its current state
                   disableGutters
                   secondaryAction={
-                    <Button
-                      variant="contained"
-                      size="small"
-                      onClick={e => {
-                        e.stopPropagation(); // Prevent expanding when clicking button
-                        handleProofOpen(task);
-                      }}
-                      disabled={task.status === 'completed' || !!task.proofUrl}
-                      sx={{mr: 2}}
-                    >
-                      {task.status === 'completed' ? 'Completed' : 'Send Proof'}
-                    </Button>
+                    task.status === 'completed' ? (
+                      <Button
+                        variant="contained"
+                        size="small"
+                        disabled
+                        sx={{ mr: 2 }}
+                      >
+                        Completed
+                      </Button>
+                    ) : task.proofUrl ? (
+                      <Button
+                        variant="contained"
+                        color="error"
+                        size="small"
+                        onClick={e => {
+                          e.stopPropagation();
+                          setSelectedTask(task);
+                          setProofOpen(true); // Open proof dialog to show/remove proof
+                        }}
+                        sx={{ mr: 2 }}
+                      >
+                        Remove Proof
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="contained"
+                        size="small"
+                        onClick={e => {
+                          e.stopPropagation();
+                          handleProofOpen(task);
+                        }}
+                        sx={{ mr: 2 }}
+                      >
+                        Send Proof
+                      </Button>
+                    )
                   }
                 >
                   <ListItemText
@@ -316,11 +392,11 @@ const Dashboard = () => {
                 </ListItem>
                 {/* Collapse component: the props "in" if true reveals the component */}
                 <Collapse in={expandedTaskId === task._id} timeout="auto" unmountOnExit sx={{mt: 2}}>
-                  <Box sx={{ pl: 4, pr: 2, pb: 2 }}>
+                  <div className='pl-4 pr-2 pb-2'>
                     <Typography variant="body2" color="text.secondary">
                       {task.instructions}
                     </Typography>
-                  </Box>
+                  </div>
                 </Collapse>
               </React.Fragment>
             ))}
@@ -329,18 +405,62 @@ const Dashboard = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Proof Dialog */}
+      {/* ---------------------------------- Proof Dialog ---------------------------------- */}
       <Dialog open={proofOpen} onClose={handleProofClose} maxWidth="xs" fullWidth>
-        <DialogTitle>Send Proof for: {selectedTask?.text}</DialogTitle>
-        <DialogContent>
+        <DialogTitle>
+          {selectedTask?.proofUrl ? 'Proof for: ' : 'Send Proof for: '} {selectedTask?.name}
+        </DialogTitle>
+        {selectedTask?.proofUrl ? (
+          <Box sx={{ textAlign: 'center' }}>
+            <img
+              src={selectedTask.proofUrl}
+              alt="Proof"
+              style={{ maxWidth: '100%', maxHeight: 300, cursor: 'pointer', borderRadius: 8 }}
+              onClick={() => handleImageModalOpen(selectedTask.proofUrl)}
+            />
+            <Button
+              variant="contained"
+              color="error"
+              sx={{ mt: 2 }}
+              onClick={handleRemoveProof}
+              fullWidth
+            >
+              Remove Proof
+            </Button>
+          </Box>
+        ) : (
           <form onSubmit={handleProofSubmit} className="flex flex-col gap-4 mt-2">
             <Button variant="contained" component="label">
               Upload Image
-              <input type="file" accept="image/*" hidden onChange={e => setProofFile(e.target.files[0])} />
+              <input type="file" accept="image/*" hidden onChange={handleProofFileChange} />
             </Button>
+            {proofPreviewUrl && (
+              <img
+                src={proofPreviewUrl}
+                alt="Preview"
+                style={{ maxWidth: '100%', maxHeight: 300, borderRadius: 8, marginTop: 8, cursor: 'pointer' }}
+                onClick={() => handleImageModalOpen(proofPreviewUrl)}
+              />
+            )}
             {proofFile && <Typography>Selected: {proofFile.name}</Typography>}
             <Button type="submit" variant="contained" color="primary" disabled={!proofFile}>Submit Proof</Button>
           </form>
+        )}
+      </Dialog>
+      {/* Image Modal */}
+      <Dialog open={imageModalOpen} onClose={handleImageModalClose} maxWidth="md">
+        <DialogTitle>
+          Image Preview
+          <IconButton
+            aria-label="close"
+            onClick={handleImageModalClose}
+            sx={{ position: 'absolute', right: 8, top: 8 }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ textAlign: 'center' }}>
+          <img src={modalImageUrl} alt="Preview" style={{ maxWidth: '100%', maxHeight: '70vh', borderRadius: 8 }} />
         </DialogContent>
       </Dialog>
     </Box>

@@ -123,7 +123,7 @@ const AddUsers = () => {
           birthDate: ''
         });
         setSelectedFile(null);
-        setPreviewUrl('');
+        setPreviewUrl(res.data.user?.picture || '');
         setErrors({});
       } else {
         toast.error(res.data.message);

@@ -114,7 +114,8 @@ const Navbar = () => {
             <>
               <IconButton onClick={handleMenu} size="medium" sx={{ ml: 1 }}>
                 <Avatar 
-                  src={user.picture ? `${import.meta.env.VITE_BACKEND_URL}${user.picture}` : profileIcon} 
+                  // src={user.picture ? `${import.meta.env.VITE_BACKEND_URL}${user.picture}` : profileIcon} 
+                  src={user.picture ? user.picture : profileIcon}
                   alt={user.name} 
                   sx={{ width: 36, height: 36, mr: 2 }} 
                 />

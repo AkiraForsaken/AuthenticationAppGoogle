@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import { useAppContext } from '../../context/AppContext'
-import { Card, CardContent, Typography, Box, Button, List, ListItem, ListItemText, MenuItem, Select, FormControl, InputLabel } from '@mui/material'
+import { Card, CardContent, Typography, Box, Button, List, ListItem, ListItemText, MenuItem, Select, FormControl, InputLabel, Dialog, DialogTitle, DialogContent } from '@mui/material'
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
 import toast from 'react-hot-toast'
 
 // Helper to get all tasks of all users. (result is object with userIds as keys and values are objects containing the user and tasksByDate objects which has dates as keys and values is an array of tasks objects)
@@ -35,6 +37,17 @@ const VerifyTask = () => {
   const [userTasks, setUserTasks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [visibleProofId, setVisibleProofId] = useState(null);
+  const [imageModalOpen, setImageModalOpen] = useState(false);
+  const [modalImageUrl, setModalImageUrl] = useState('');
+
+  const handleImageModalOpen = (url) => {
+    setModalImageUrl(url);
+    setImageModalOpen(true);
+  };
+  const handleImageModalClose = () => {
+    setImageModalOpen(false);
+    setModalImageUrl('');
+  };
 
   const fetchUserTasks = async (userId) => {
     setLoading(true);
@@ -159,10 +172,13 @@ const VerifyTask = () => {
                           </Button>
                           {visibleProofId === task._id && (
                             <img
-                              src={`${import.meta.env.VITE_BACKEND_URL}${task.proofUrl}`}
+                              // src={`${import.meta.env.VITE_BACKEND_URL}${task.proofUrl}`}
+                              src={task.proofUrl}
                               alt="Proof"
                               // style={{ maxWidth: 200, marginTop: 8, borderRadius: 8 }}
+                              style={{ cursor: 'pointer', maxWidth: 200, maxHeight: 200 }}
                               className='max-w-200 mt-8 rounded-md'
+                              onClick={() => handleImageModalOpen(task.proofUrl)}
                             />
                           )}
                         </>
@@ -175,6 +191,24 @@ const VerifyTask = () => {
           ))}
         </CardContent>
       </Card>
+      {/* ----------------- Image preview dialog ------------------ */}
+      <Dialog open={imageModalOpen} onClose={handleImageModalClose} maxWidth="md">
+        <DialogTitle>
+          Image Preview
+          <IconButton
+            aria-label="close"
+            onClick={handleImageModalClose}
+            sx={{ position: 'absolute', right: 8, top: 8 }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ textAlign: 'center' }}>
+          {modalImageUrl && (
+            <img src={modalImageUrl} alt="Preview" style={{ maxWidth: '100%', maxHeight: '70vh', borderRadius: 8 }} />
+          )}
+        </DialogContent>
+      </Dialog>
     </Box>
   )
 }

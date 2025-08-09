@@ -3,11 +3,10 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import axios from "axios";
 
-console.log(process.env.NODE_ENV);
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = process.env.NODE_ENV === 'production' 
                             ? import.meta.env.VITE_BACKEND_URL
-                            : import.meta.env.VITE_BACKEND_URL;
+                            : "http://localhost:5000";
 
 export const AppContext = createContext();
 
@@ -122,7 +121,7 @@ export const AppContextProvider = ({children})=>{
         localStorage.setItem('darkMode', JSON.stringify(darkMode));
     }, [darkMode]);
 
-    const value = {navigate, user, setUser, isAdmin, setIsAdmin, userList, setUserList, userTasks, setUserTasks, axios, darkMode, setDarkMode, notifications, unreadCount, fetchNotifications};
+    const value = {navigate, user, setUser, isAdmin, setIsAdmin, userList, setUserList, userTasks, setUserTasks, axios, darkMode, setDarkMode, notifications, unreadCount, fetchNotifications, fetchTasks};
 
     return <AppContext.Provider value={value}>
         {children}

@@ -19,7 +19,6 @@ const Profile = () => {
     tiktok: '',
     twitter: ''
   });
-  const [picture, setPicture] = useState(user?.picture || '');
   const [uploading, setUploading] = useState(false);
 
   const handleSave = async ()=>{
@@ -141,7 +140,8 @@ const Profile = () => {
           <CardContent>
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
               <Avatar 
-                src={user.picture ? `${import.meta.env.VITE_BACKEND_URL}${user.picture}` : undefined} 
+                // src={user.picture ? `${import.meta.env.VITE_BACKEND_URL}${user.picture}` : undefined} 
+                src={user.picture ? user.picture : undefined}
                 alt={user.name} 
                 sx={{ width: 150, height: 150, mb: 2 }} 
               />
