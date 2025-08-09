@@ -21,7 +21,7 @@ const Home = () => {
     const { user, navigate, axios } = useAppContext();
     
     // Temporary test function
-    const testBackend = async () => {
+    /* const testBackend = async () => {
       try {
         console.log('Testing backend connection...');
         const res = await axios.get('/api/health');
@@ -48,7 +48,7 @@ const Home = () => {
         console.error('Backend test failed:', error);
         alert('Backend connection failed: ' + error.message);
       }
-    };
+    }; */
 
   return (
     <Box sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 900, py: 5, bgcolor: 'mainBg.main'}}>
@@ -61,13 +61,13 @@ const Home = () => {
       </Typography>
       
       {/* Temporary test button */}
-      <Button 
+      {/* <Button 
         variant="outlined" 
         onClick={testBackend}
         sx={{mb: 4}}
       >
         Test Backend Connection
-      </Button>
+      </Button> */}
       
       <Grid container spacing={4} justifyContent="center" sx={{mb: 4, gap: 4}}>
         {features.map((feature, i) => (

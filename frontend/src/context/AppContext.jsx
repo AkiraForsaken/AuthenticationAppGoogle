@@ -17,28 +17,27 @@ axios.defaults.withCredentials = true; // This is crucial for sending cookies
 axios.defaults.headers.common['Content-Type'] = 'application/json';
 
 // Add request interceptor for debugging
-axios.interceptors.request.use(
+/* axios.interceptors.request.use(
   (config) => {
     console.log('Making request to:', config.baseURL + config.url);
-    console.log('With credentials:', config.withCredentials);
     return config;
   },
   (error) => {
     return Promise.reject(error);
   }
-);
+); */
 
 // Add response interceptor for debugging
-axios.interceptors.response.use(
+/* axios.interceptors.response.use(
   (response) => {
-    console.log('Response received:', response.status, response.config.url);
+    console.log('Response received:', response.status, response.config.url, response.data);
     return response;
   },
   (error) => {
     console.error('Request failed:', error.response?.status, error.response?.data || error.message);
     return Promise.reject(error);
   }
-);
+); */
 
 export const AppContext = createContext();
 
@@ -57,16 +56,14 @@ export const AppContextProvider = ({children})=>{
 
     const fetchUser = async ()=>{
         try {
-            console.log('Fetching user authentication...');
             const res = await axios.get('/api/users/is-auth');
-            console.log('Auth response:', res.data);
-            
             if (res.data.success){
                 setUser(res.data.user);
                 setIsAdmin(res.data.user.role === 'admin');
                 console.log('User authenticated:', res.data.user.name);
             } else {
-                console.log('No authenticated user found');
+                toast.error("Errors in fetchUser")
+                console.log(res.data.message);
                 setUser(null);
                 setIsAdmin(false);
             }
@@ -85,27 +82,28 @@ export const AppContextProvider = ({children})=>{
                 setUserTasks(res.data.tasks);
                 // console.log("Tasks fetched", res.data.tasks);
             } else {
-                toast.error(res.data.message);
+                toast.error('Errors in fetchTasks')
+                console.error(res.data.message);
             }
         } catch (error) {
-            toast.error(error.message);
+            toast.error('Errors in fetchTasks (error)')
+            console.error(error.response?.data?.message);
         }
     }
 
     const fetchUserList = async ()=>{
         try {
-            console.log('Fetching user list...');
             const res = await axios.get('/api/users/list');
             if (res.data.success){
                 setUserList(res.data.users);
                 console.log('User list fetched successfully:', res.data.users.length, 'users');
             } else {
-                console.error('Failed to fetch user list:', res.data.message);
-                toast.error(res.data.message);
+                toast.error('Errors in fetchUserList');
+                console.error(res.data.message);
             }
         } catch (error) {
-            console.error('Error fetching user list:', error);
-            toast.error(error.response?.data?.message || 'Failed to fetch user list');
+            toast.error('Errors in fetchUserList (error)');
+            console.error(error.response?.data?.message || 'Failed to fetch user list');
         }
     }
 
@@ -130,10 +128,12 @@ export const AppContextProvider = ({children})=>{
                 setNotifications(res.data.notifications);
                 setUnreadCount(res.data.notifications.filter(n => !n.isRead).length);
             } else {
-                toast.error(res.data.message)
+                toast.error('Errors in fetchNotifications')
+                console.error(res.data.message)
             }
         } catch (error) {
             toast.error('Failed to fetch notifications:', error);
+            console.error(error.response?.data?.message || 'Failed to fetch notifications')
         }
     }
 

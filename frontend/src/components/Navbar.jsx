@@ -90,7 +90,6 @@ const Navbar = () => {
                   const res = await axios.post('/api/auth/google', {
                     credential: credentialResponse.credential
                   });
-                  console.log('Backend login response:', res.data);
                   
                   if (res.data.success){
                     setUser(res.data.user);
